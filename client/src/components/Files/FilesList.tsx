@@ -12,6 +12,17 @@ const FilesList = () => {
     }
 
     useEffect(() => {
+        const ws = new WebSocket(`ws://localhost:3001`);
+        ws.onopen = () => {
+            console.log('connected to server');
+        }
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'upload_complete') {
+                console.log('upload_complete');
+                fetchFiles();
+            }
+        }
         fetchFiles();
     }, []);
 

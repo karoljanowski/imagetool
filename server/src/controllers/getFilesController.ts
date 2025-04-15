@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { Request, Response } from "express";
+import db from "../db";
 
 const getFilesController = async (req: Request, res: Response) => {
     const token = req.query.token as string;
@@ -11,21 +12,15 @@ const getFilesController = async (req: Request, res: Response) => {
         });
     }
 
-    const __dirname = path.resolve();
-    const uploadDir = path.join(__dirname, "uploads", token);
-
-    if (!fs.existsSync(uploadDir)) {
-        res.status(404).json({
-            message: "No files found"
-        });
-    }
-
-    const files = fs.readdirSync(uploadDir);
+    const files = await db.file.findMany({
+        where: {
+            token
+        }
+    })
 
     const filesList = files.map(file => {
         return {
-            url: `${process.env.SERVER_URL}/api/file/${token}/${file}`,
-            
+            url: `${process.env.SERVER_URL}/api/file/${token}/${file.id}.webp`,
         }
     })
 

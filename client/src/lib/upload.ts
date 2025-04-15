@@ -2,11 +2,25 @@ import axios from "axios";
 import getToken from "./token";
 
 const upload = async (file: File) => {
-    const formData = new FormData();
     const token = await getToken();
-    formData.append('token', token);
-    formData.append("file", file);
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/upload`, formData);
+
+    // step 1: init upload
+    const initFormData = new FormData();
+    initFormData.append('token', token);
+    initFormData.append("fileName", file.name);
+
+    const initUploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/init-upload`, initFormData);
+
+    if (initUploadResponse.status !== 200) {
+        throw new Error("Failed to initialize upload");
+    }
+
+    const uploadFormData = new FormData();
+    uploadFormData.append('fileId', initUploadResponse.data.fileId);
+    uploadFormData.append("file", file);
+
+    // step 2: upload file
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/upload`, uploadFormData);
 
     if (response.status !== 200) {
         throw new Error("Failed to upload file");

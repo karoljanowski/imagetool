@@ -20,7 +20,16 @@ const getFilesController = async (req: Request, res: Response) => {
 
     const filesList = files.map(file => {
         return {
-            url: `${process.env.SERVER_URL}/api/file/${token}/${file.id}.webp`,
+            id: file.id,
+            url: `${process.env.SERVER_URL}/api/file/${token}/${file.id}.${file.format}`,
+            status: file.status,
+            name: file.name,
+            size: file.size,
+            format: file.format,
+            createdAt: file.createdAt,
+            updatedAt: file.updatedAt,
+            width: file.width,
+            height: file.height
         }
     })
 

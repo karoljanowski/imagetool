@@ -9,21 +9,7 @@ const app: Express = express();
 const port = process.env.PORT;
 const server = http.createServer(app);
 
-// Create WebSocket server
 const wss = new WebSocketServer({ server });
-
-// WebSocket connection handling
-wss.on('connection', (ws) => {
-    console.log('New WebSocket connection');
-    
-    ws.on('message', (message) => {
-        console.log('Received:', message);
-    });
-    
-    ws.on('close', () => {
-        console.log('Client disconnected');
-    });
-});
 
 app.use(cors());
 app.use("/api", uploadRoutes);

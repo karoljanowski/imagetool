@@ -15,6 +15,7 @@ const upload = multer({
 const initUploadController = async (req: Request, res: Response) => {
     const token = req.body.token;
     const fileName = req.body.fileName;
+    const format = req.body.format;
 
     if (!token || !fileName) {
         res.status(400).json({
@@ -27,21 +28,22 @@ const initUploadController = async (req: Request, res: Response) => {
         data: {
             token,
             name: fileName,
-            status: "pending"
+            status: "pending",
+            format
         }
     })
-
-    wss.clients.forEach((client: WebSocket) => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({
-                type: 'upload_complete',
-            }));
-        }
-    });
-
+    
     res.status(200).json({
         message: "Upload initialized",
         fileId: file.id
+    });
+    
+    wss.clients.forEach((client: WebSocket) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+                type: 'upload_init',
+            }));
+        }
     });
 }
 
@@ -99,9 +101,17 @@ const uploadController = async (req: Request, res: Response) => {
                 path: filePath
             }
         })
-        
+
         res.status(200).json({
             message: "File uploaded successfully"
+        });
+
+        wss.clients.forEach((client: WebSocket) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({
+                    type: 'upload_complete',
+                }));
+            }
         });
     } catch (error) {
         console.error("Error uploading file:", error);

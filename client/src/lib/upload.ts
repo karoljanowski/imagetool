@@ -3,11 +3,13 @@ import getToken from "./token";
 
 const upload = async (file: File) => {
     const token = await getToken();
+    const format = file.type.split("/")[1];
 
     // step 1: init upload
     const initFormData = new FormData();
     initFormData.append('token', token);
     initFormData.append("fileName", file.name);
+    initFormData.append("format", format);
 
     const initUploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/init-upload`, initFormData);
 

@@ -9,7 +9,7 @@ const Header = () => {
                 TOOL
             </Link>
             <div className="flex items-center gap-4">
-                <Link href="/upload" className="text-sm font-medium hover:text-neutral-400 transition-colors">Upload</Link>
+                <Link href="/files" className="text-sm font-medium hover:text-neutral-400 transition-colors">Files</Link>
                 <Link href="/about" className="text-sm font-medium hover:text-neutral-400 transition-colors">About</Link>
                 <Link href="/contact" className="text-sm font-medium hover:text-neutral-400 transition-colors">Contact</Link>
             </div>

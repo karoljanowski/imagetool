@@ -1,8 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { FileCog2Icon } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { NewFilesSettings, File } from "@/lib/types/file";
 
-const FormatOptions = () => {
+const FormatOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }: { 
+    setNewFilesSettings: (newFilesSettings: NewFilesSettings[]) => void, 
+    selectedFiles: File[],
+    newFilesSettings: NewFilesSettings[]
+}) => {
     const [selectedFormat, setSelectedFormat] = useState<string>('png');
     
     const formats = [
@@ -11,6 +16,17 @@ const FormatOptions = () => {
         { id: 'webp', label: 'WEBP', description: 'Modern format, great compression' },
         { id: 'avif', label: 'AVIF', description: 'Next-gen format, best compression' }
     ];
+
+    useEffect(() => {
+        const updatedSettings = newFilesSettings.map(setting => {
+            if (selectedFiles.some(file => file.id === setting.fileId)) {
+                return { ...setting, newFormat: selectedFormat };
+            }
+            return setting;
+        });
+        setNewFilesSettings(updatedSettings);
+    }, [selectedFormat]);
+    
 
     return (
         <div className="flex flex-col gap-2 w-full">

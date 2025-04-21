@@ -25,11 +25,9 @@ const getFilesController = async (req: Request, res: Response) => {
             status: file.status,
             name: file.name,
             size: file.size,
-            format: file.format,
-            createdAt: file.createdAt,
-            updatedAt: file.updatedAt,
-            width: file.width,
-            height: file.height
+            originalFormat: file.format,
+            originalWidth: file.width,
+            originalHeight: file.height,
         }
     })
 

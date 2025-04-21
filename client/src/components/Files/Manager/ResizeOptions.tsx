@@ -2,12 +2,38 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LockIcon, UnlockIcon, ScalingIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { NewFilesSettings, File } from "@/lib/types/file";
 
-const ResizeOptions = () => {
+const ResizeOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }: { 
+    setNewFilesSettings: (newFilesSettings: NewFilesSettings[]) => void, 
+    selectedFiles: File[],
+    newFilesSettings: NewFilesSettings[]
+}) => {
     const [width, setWidth] = useState<number | ''>('');
     const [height, setHeight] = useState<number | ''>('');
     const [locked, setLocked] = useState(true);
+
+    const handleResize = () => {
+        if (!width && !height) return;
+        
+        const updatedSettings = newFilesSettings.map(setting => {
+            if (selectedFiles.some(file => file.id === setting.fileId)) {
+                return {
+                    ...setting,
+                    newWidth: width || setting.newWidth,
+                    newHeight: height || setting.newHeight
+                };
+            }
+            return setting;
+        });
+
+        setNewFilesSettings(updatedSettings);
+    }
+    
+    useEffect(() => {
+        handleResize();
+    }, [width, height]);
 
     return (
         <div className="flex flex-col gap-2 w-full">
@@ -28,6 +54,7 @@ const ResizeOptions = () => {
                                 placeholder="Width" 
                                 value={width}
                                 min={1}
+                                onChange={(e) => setWidth(e.target.value ? parseInt(e.target.value) : '')}
                                 className="pl-8"
                             />
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xs text-neutral-400">W</span>
@@ -49,6 +76,7 @@ const ResizeOptions = () => {
                                 placeholder="Height" 
                                 value={height}
                                 min={1}
+                                onChange={(e) => setHeight(e.target.value ? parseInt(e.target.value) : '')}
                                 className="pl-8"
                             />
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xs text-neutral-400">H</span>

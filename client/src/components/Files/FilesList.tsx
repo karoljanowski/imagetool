@@ -74,7 +74,7 @@ const FilesList = () => {
 
     useEffect(() => {
         files.forEach((file) => {
-            if (file.status === 'uploaded') {
+            if (file.status === 'UPLOADED') {
                 setNewFilesSettings((prev) => [...prev, { 
                     fileId: file.id, 
                     newFormat: file.originalFormat || '', 

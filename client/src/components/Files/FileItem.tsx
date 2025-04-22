@@ -1,6 +1,6 @@
 import { ArrowRightIcon, CheckCircleIcon, FileCog2Icon, FileIcon, ImageUpscale, Loader2Icon, TrashIcon, XCircleIcon, DatabaseIcon, CheckIcon, XIcon } from "lucide-react"
 import Image from "next/image"
-import { File, NewFilesSettings } from "@/lib/types/file"
+import { File, NewFilesSettings, FileStatus } from "@/lib/types/file"
 import { useState } from "react"
 import { formatFileSize } from "@/lib/utils"
 import { Button } from "../ui/button"
@@ -87,7 +87,7 @@ const FileItem = ({ file, selectedFiles, setSelectedFiles, newFilesSettings, fet
             
             <div className="flex justify-between items-center w-full border-t border-neutral-600/50 pt-2">
                 <StatusBadge status={file.status} />
-                {isHovered && file.status !== 'pending' && (
+                {isHovered && file.status !== 'UPLOADING' && (
                     <div className="flex items-center gap-2">
                         <Button variant="destructive" className="p-1" onClick={handleDelete} disabled={isDeleting}>
                             {isDeleting ? (
@@ -106,7 +106,7 @@ const FileItem = ({ file, selectedFiles, setSelectedFiles, newFilesSettings, fet
 const ImagePreview = ({ file }: { file: File }) => {
     return (
         <div className="w-[150px] h-[150px] bg-neutral-700 rounded-md flex items-center justify-center overflow-hidden">
-            {file.status === 'pending' ? (
+            {file.status === 'UPLOADING' ? (
                 <div className="flex items-center justify-center w-full h-full">
                     <Loader2Icon className="w-8 h-8 text-neutral-300 animate-spin" />
                 </div>
@@ -125,29 +125,35 @@ const ImagePreview = ({ file }: { file: File }) => {
     )
 }
 
-const StatusBadge = ({ status }: { status: string }) => {
+const StatusBadge = ({ status }: { status: FileStatus }) => {
     const statusConfig = {
-        'pending': {
+        'UPLOADING': {
             icon: <Loader2Icon className="w-3 h-3 animate-spin" />,
-            text: 'Processing',
+            text: 'Uploading',
             bgColor: 'bg-yellow-500/10',
             textColor: 'text-yellow-400',
         },
-        'uploaded': {
+        'UPLOADED': {
             icon: <CheckCircleIcon className="w-3 h-3" />,
             text: 'Uploaded',
             bgColor: 'bg-green-500/10',
             textColor: 'text-green-400',
         },
-        'error': {
-            icon: <XCircleIcon className="w-3 h-3" />,
-            text: 'Failed',
-            bgColor: 'bg-red-500/10',
-            textColor: 'text-red-400',
-        }
+        'PROCESSING': {
+            icon: <Loader2Icon className="w-3 h-3 animate-spin" />,
+            text: 'Processing',
+            bgColor: 'bg-yellow-500/10',
+            textColor: 'text-yellow-400',
+        },
+        'PROCESSED': {
+            icon: <CheckCircleIcon className="w-3 h-3" />,
+            text: 'Processed',
+            bgColor: 'bg-green-500/10',
+            textColor: 'text-green-400',
+        },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.UPLOADING;
 
     return (
         <div className={`text-xs rounded-full px-2 py-1 flex items-center gap-1.5 ${config.bgColor} ${config.textColor}`}>

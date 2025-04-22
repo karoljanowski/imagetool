@@ -7,7 +7,7 @@ import multer from "multer";
 import db from "../db";
 import { wss } from "../server";
 import { WebSocket } from "ws";
-
+import { FileFormat } from "../generated/prisma";
 const upload = multer({
     storage: multer.memoryStorage(),
 });
@@ -29,7 +29,7 @@ const initUploadController = async (req: Request, res: Response) => {
             data: {
                 token,
                 name: fileName,
-                status: "pending",
+                status: "UPLOADING",
                 format
             }
         });
@@ -100,8 +100,8 @@ const uploadController = async (req: Request, res: Response) => {
                 id: fileId
             },
             data: {
-                status: "uploaded",
-                format: metadata.format,
+                status: "UPLOADED",
+                format: metadata.format as FileFormat,
                 size: fileBuffer.size,
                 width: metadata.width,
                 height: metadata.height,

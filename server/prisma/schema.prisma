@@ -18,10 +18,32 @@ model File {
   id        String   @id @default(uuid())
   token     String
   name      String
-  format    String
+  format    FileFormat
+  status    FileStatus
   size      Int?
   width     Int?
   height    Int?
   path      String?
-  status    String
+  // Processed file
+  processedPath String?
+  processedWidth Int?
+  processedHeight Int?
+  processedFormat FileFormat?
+  processedSize Int?
+  processedRemovedBackground Boolean?
+  processedCompressed Boolean?
+}
+
+enum FileStatus {
+  UPLOADING
+  UPLOADED
+  PROCESSING
+  PROCESSED
+}
+
+enum FileFormat {
+  png
+  jpg
+  webp
+  avif
 }

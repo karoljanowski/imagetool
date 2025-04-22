@@ -1,7 +1,7 @@
 export type File = {
     id: string;
     url: string;
-    status: 'pending' | 'uploaded';
+    status: FileStatus;
     name: string;
     size?: number;
     originalWidth?: number;
@@ -17,3 +17,5 @@ export type NewFilesSettings = {
     removeBackground: boolean;
     compress: boolean;
 }
+
+export type FileStatus = 'UPLOADING' | 'UPLOADED' | 'PROCESSING' | 'PROCESSED';

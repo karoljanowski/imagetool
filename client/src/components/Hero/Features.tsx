@@ -2,6 +2,7 @@
 import { DatabaseIcon, ScalingIcon, FileCogIcon, FullscreenIcon, ZapIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 const Features = () => {
     const features = [
@@ -78,9 +79,11 @@ const Features = () => {
                 transition={{ duration: 0.5, delay: 0.5 }}
                 className="mt-12 text-center"
             >
-                <Button variant="secondary" size="lg">
-                    Try It Now
-                </Button>
+                <Link href="/files">
+                    <Button variant="secondary" size="lg">
+                        Try It Now
+                    </Button>
+                </Link>
                 <p className="mt-4 text-sm text-neutral-400">No account required. Try all features instantly.</p>
             </motion.div>
         </div>

@@ -26,7 +26,11 @@ const FilesList = () => {
 
     const fetchFiles = async () => {
         const data = await getFiles();
-        setFiles(data.filesList);
+        if (data.success) {
+            setFiles(data.filesList);
+        } else {
+            toast.error(data.message);
+        }
     }
 
     const handleSelectButton = () => {

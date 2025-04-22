@@ -1,11 +1,9 @@
 import { Router } from "express";
 import { deleteAllFilesController, deleteFileController } from "../controllers/deleteController";
-import multer from "multer";
 
 const router = Router();
-const upload = multer();
 
-router.delete("/deleteAll/:token", upload.none(), deleteAllFilesController);
-router.delete("/delete/:token/:fileId", upload.none(), deleteFileController);
+router.delete("/deleteAll/:token", deleteAllFilesController);
+router.delete("/delete/:token/:fileId", deleteFileController);
 
 export default router;

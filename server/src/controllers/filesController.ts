@@ -5,7 +5,7 @@ import db from "../db";
 
 const getFilesController = async (req: Request, res: Response) => {
     try {
-        const token = req.query.token as string;
+        const token = req.params.token;
 
         if (!token) {
             res.status(400).json({

@@ -1,38 +1,94 @@
-import { ImagePlusIcon, Repeat2Icon, BoxIcon, ArrowUpRightIcon } from "lucide-react";
-
+'use client'
+import { ArrowUpIcon, SparklesIcon } from "lucide-react";
+import { motion } from "motion/react";
+import { Button } from "../ui/button";
+import Link from "next/link";
 const HeroTop = () => {
     return (
-        <div className="flex items-center justify-between gap-2">
+        <div className="space-y-8">
             <HeroText />
-            <Adventages />
+            <HeroStats />
         </div>
     )
 }
+
 const HeroText = () => {
     return (
-        <div className="flex flex-col justify-center gap-2 w-1/2">
-            <h1 className="text-7xl font-light uppercase gap-6">Fast, simple<br/> powerful <ImagePlusIcon strokeWidth={1} className="inline-block mb-1 w-16 h-16" /> tool</h1>
-            <p className="text-xl font-light uppercase text-gray-400 flex items-center gap-4">All you need to do is upload your image and we'll handle the rest</p>
+        <div className="space-y-6">
+            {/* Badge */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <span className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/20">
+                    <SparklesIcon className="w-3.5 h-3.5 mr-1.5" />
+                    Easy • Fast • Powerful
+                </span>
+            </motion.div>
+            
+            {/* Headline */}
+            <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight"
+            >
+                Transform your 
+                <span className="relative">
+                    <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500"> images </span>
+                </span>
+                in seconds
+            </motion.h1>
+            
+            {/* Subheadline */}
+            <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="text-lg text-gray-400 max-w-lg"
+            >
+                Upload, transform, and download your images with our all-in-one solution. No signup required.
+            </motion.p>
+            
+            {/* CTA Button */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="pt-2"
+            >
+                <Link href="/files">
+                    <Button variant="secondary" size="lg">
+                        Upload your image
+                    </Button>
+                </Link>
+            </motion.div>
         </div>
     )
 }
 
-const Adventages = () => {
+const HeroStats = () => {
+    const stats = [
+        { label: "Image Formats", value: "4" },
+        { label: "Tools Available", value: "4" },
+        { label: "Processed Images", value: "10K+" }
+    ]
+    
     return (
-        <div className="flex w-1/2 h-full justify-end gap-4">
-            <div className="w-36 h-36 border-2 border-white rounded-full flex flex-col items-center justify-center p-4 gap-2">
-                <Repeat2Icon strokeWidth={1} className="w-12 h-12 text-white" />
-                <p className="text-sm uppercase text-center leading-none">4 operations on go</p>
-            </div>
-            <div className="w-36 h-36 border-2 border-white rounded-full flex flex-col items-center justify-center p-4 gap-2">
-                <BoxIcon strokeWidth={1} className="w-12 h-12 text-white" />
-                <p className="text-sm uppercase text-center leading-none">No image limits</p>
-            </div>
-            <div className="w-36 h-36 border-2 border-white rounded-full">
-                <ArrowUpRightIcon strokeWidth={0.5} className="w-36 h-36 text-white" />
-            </div>
-
-        </div>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="flex items-center gap-8"
+        >
+            {stats.map((stat, index) => (
+                <div key={stat.label} className="flex flex-col">
+                    <span className="text-2xl font-bold text-white">{stat.value}</span>
+                    <span className="text-sm text-gray-400">{stat.label}</span>
+                </div>
+            ))}
+        </motion.div>
     )
 }
 

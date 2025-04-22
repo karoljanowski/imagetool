@@ -9,43 +9,6 @@ body {
   font-family: var(--font-poppins);
 }
 
-.animate-spin-slow {
-  animation: spin 20s linear infinite;
-}
-
-.corner {
-  position: absolute;
-  width: 5rem;
-  height: 5rem;
-  border: 3px solid white;
-  border-radius: 3px;
-  transition: none;
-}
-
-.top-left {
-  top: 0px;
-  left: 0px;
-  border-right: none;
-  border-bottom: none;
-}
-
-.top-right {
-  top: 0px;
-  right: 0px;
-  border-left: none;
-  border-bottom: none;
-}
-
-.bottom-left {
-  bottom: 0px;
-  left: 0px;
-  border-right: none;
-  border-top: none;
-}
-
-.bottom-right {
-  bottom: 0px;
-  right: 0px;
-  border-left: none;
-  border-top: none;
+.mask-scroll-container {
+  mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black calc(100% - 20px), transparent 100%);
 }

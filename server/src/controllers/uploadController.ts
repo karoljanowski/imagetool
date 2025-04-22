@@ -13,69 +13,76 @@ const upload = multer({
 });
 
 const initUploadController = async (req: Request, res: Response) => {
-    const token = req.body.token;
-    const fileName = req.body.fileName;
-    const format = req.body.format;
+    try {
+        const token = req.body.token;
+        const fileName = req.body.fileName;
+        const format = req.body.format;
 
-    if (!token || !fileName) {
-        res.status(400).json({
-            message: "No token or fileName"
+        if (!token || !fileName) {
+            res.status(400).json({
+                message: "No token or fileName"
+            });
+            return;
+        }
+
+        const file = await db.file.create({
+            data: {
+                token,
+                name: fileName,
+                status: "pending",
+                format
+            }
         });
-        return;
+        
+        res.status(200).json({
+            message: "Upload initialized",
+            fileId: file.id
+        });
+        
+        wss.clients.forEach((client: WebSocket) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({
+                    type: 'upload_init',
+                }));
+            }
+        });
+    } catch (error) {
+        console.error('Error in initUploadController:', error);
+        res.status(500).json({
+            message: "Internal server error"
+        });
     }
-
-    const file = await db.file.create({
-        data: {
-            token,
-            name: fileName,
-            status: "pending",
-            format
-        }
-    })
-    
-    res.status(200).json({
-        message: "Upload initialized",
-        fileId: file.id
-    });
-    
-    wss.clients.forEach((client: WebSocket) => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({
-                type: 'upload_init',
-            }));
-        }
-    });
 }
 
 const uploadController = async (req: Request, res: Response) => {
-    await new Promise(resolve => setTimeout(resolve, 10000));
-    const fileBuffer = req.file;
-    const fileId = req.body.fileId;
-
-    if (!fileBuffer || !fileId) {
-        res.status(400).json({
-            message: "No file or fileId"
-        });
-        return;
-    }
-
-    const file = await db.file.findUnique({
-        where: {
-            id: fileId
-        }
-    })
-
-    if (!file) {
-        res.status(404).json({
-            message: "File not found"
-        });
-        return;
-    }
-
-    const __dirname = path.resolve();
-    const uploadDir = path.join(__dirname, "uploads", file.token);
-
     try {
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        const fileBuffer = req.file;
+        const fileId = req.body.fileId;
+
+        if (!fileBuffer || !fileId) {
+            res.status(400).json({
+                message: "No file or fileId"
+            });
+            return;
+        }
+
+        const file = await db.file.findUnique({
+            where: {
+                id: fileId
+            }
+        });
+
+        if (!file) {
+            res.status(404).json({
+                message: "File not found"
+            });
+            return;
+        }
+
+        const __dirname = path.resolve();
+        const uploadDir = path.join(__dirname, "uploads", file.token);
+
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
@@ -100,7 +107,7 @@ const uploadController = async (req: Request, res: Response) => {
                 height: metadata.height,
                 path: filePath
             }
-        })
+        });
 
         res.status(200).json({
             message: "File uploaded successfully"
@@ -114,12 +121,18 @@ const uploadController = async (req: Request, res: Response) => {
             }
         });
     } catch (error) {
-        console.error("Error uploading file:", error);
+        console.error('Error in uploadController:', error);
+        wss.clients.forEach((client: WebSocket) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({
+                    type: 'upload_error',
+                }));
+            }
+        });
         res.status(500).json({
-            message: "Error uploading file"
+            message: "Internal server error"
         });
     }
 }
-
 
 export { uploadController, initUploadController, upload };

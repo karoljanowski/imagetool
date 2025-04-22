@@ -1,6 +1,6 @@
 const Background = () => {
     return (
-        <div className="absolute top-0 left-0 w-full h-full grid grid-cols-1 -z-10 *:col-start-1 *:row-start-1 *:col-end-1 *:row-end-1">
+        <div className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden grid grid-cols-1 -z-10 *:col-start-1 *:row-start-1 *:col-end-1 *:row-end-1">
             <svg width="526" height="1003" viewBox="0 0 526 1003" fill="red" xmlns="http://www.w3.org/2000/svg" className="animate-spin-slow">
                 <path d="M1 307L295.5 2V351C367 315.333 512.1 242.3 520.5 235.5C528.9 228.7 524 480.667 520.5 607.5L85 1001L1 307Z"/>
             </svg>

@@ -1,17 +1,28 @@
 'use client'
 import getFiles from "@/lib/files";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Manager from "./Manager/Manager";
 import { File, NewFilesSettings } from "@/lib/types/file";
 import FileItem from "./FileItem";
 import { Button } from "../ui/button";
-import deleteAllFiles from "@/lib/delete";
+import { deleteAllFiles } from "@/lib/delete";
+import { toast } from "sonner";
 
 
 const FilesList = () => {
     const [files, setFiles] = useState<File[]>([]);
     const [newFilesSettings, setNewFilesSettings] = useState<NewFilesSettings[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [isDeletingAll, setIsDeletingAll] = useState(false);
+    const managerRef = useRef<HTMLDivElement>(null);
+    const listRef = useRef<HTMLDivElement>(null);
+
+    const calculateFilesListHeight = () => {
+        const listFromTop = listRef.current?.offsetTop;
+        const managerHeight = managerRef.current?.offsetHeight;
+        const height = `calc(100svh - ${listFromTop}px - ${managerHeight}px - 50px)`;
+        return height;
+    }
 
     const fetchFiles = async () => {
         const data = await getFiles();
@@ -27,8 +38,15 @@ const FilesList = () => {
     }
 
     const handleDeleteAll = async () => {
-        await deleteAllFiles();
-        fetchFiles();
+        setIsDeletingAll(true);
+        const data = await deleteAllFiles();
+        if (data.success) {
+            toast.success(data.message);
+            fetchFiles();
+        } else {
+            toast.error(data.message);
+        }
+        setIsDeletingAll(false);
     }
 
     useEffect(() => {
@@ -37,8 +55,15 @@ const FilesList = () => {
         const ws = new WebSocket(`ws://localhost:3001`);
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            if (data.type === 'upload_complete' || data.type === 'upload_init') {
+            if (data.type === 'upload_complete' || data.type === 'upload_init' || data.type === 'upload_error') {
                 fetchFiles();
+            }
+            if (data.type === 'upload_error') {
+                toast.error('Failed to upload file');
+            }
+
+            if (data.type === 'upload_complete') {
+                toast.success('File uploaded successfully');
             }
         }
     }, []);
@@ -60,28 +85,31 @@ const FilesList = () => {
 
     return (
         <>
-        <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                    <h1 className="text-2xl font-bold">Your uploads</h1>
-                    <p className="text text-neutral-400 mb-4">Select image and chose what you want to do with it</p>
+            <div className="container mx-auto px-4">
+                <div className="flex justify-between md:items-center flex-col md:flex-row">
+                    <div className="flex flex-col">
+                        <h1 className="text-2xl font-bold">Your uploads</h1>
+                        <p className="text-sm text-neutral-400 mb-4">Select image and chose what you want to do with it</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button onClick={handleSelectButton}>
+                            {selectedFiles.length === files.length ? 'Deselect all' : 'Select all'}
+                        </Button>
+                        <Button variant="destructive" onClick={handleDeleteAll} disabled={isDeletingAll}>
+                            {isDeletingAll ? 'Deleting...' : 'Delete all'}
+                        </Button>
+                    </div>
                 </div>
-                <div className="flex gap-2">
-                    <Button onClick={handleSelectButton}>
-                        {selectedFiles.length === files.length ? 'Deselect all' : 'Select all'}
-                    </Button>
-                    <Button variant="destructive" onClick={handleDeleteAll}>
-                        Delete all
-                    </Button>
+                <div ref={listRef} className="overflow-y-auto relative mask-scroll-container" 
+                    style={{ height: calculateFilesListHeight() }}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-6">
+                        {files && files.map((file) => (
+                            <FileItem key={file.id} file={file} newFilesSettings={newFilesSettings} selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} fetchFiles={fetchFiles} />
+                        ))}
+                    </div>
                 </div>
             </div>
-            <div className="grid grid-cols-4 gap-4">
-                {files && files.map((file) => (
-                    <FileItem key={file.id} file={file} newFilesSettings={newFilesSettings} selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} />
-                ))}
-            </div>
-        </div>
-        <Manager selectedFiles={selectedFiles} setNewFilesSettings={setNewFilesSettings} newFilesSettings={newFilesSettings} />
+            <Manager ref={managerRef} selectedFiles={selectedFiles} setNewFilesSettings={setNewFilesSettings} newFilesSettings={newFilesSettings} />
         </>
     )
 }

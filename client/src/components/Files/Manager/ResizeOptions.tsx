@@ -12,7 +12,6 @@ const ResizeOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }:
 }) => {
     const [width, setWidth] = useState<number | ''>('');
     const [height, setHeight] = useState<number | ''>('');
-    const [locked, setLocked] = useState(true);
 
     const handleResize = () => {
         if (!width && !height) return;
@@ -34,6 +33,13 @@ const ResizeOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }:
     useEffect(() => {
         handleResize();
     }, [width, height]);
+
+    useEffect(() => {
+        if (selectedFiles.length > 0) {
+            setWidth('');
+            setHeight('');
+        }
+    }, [selectedFiles]);
 
     return (
         <div className="flex flex-col gap-2 w-full">
@@ -59,17 +65,7 @@ const ResizeOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }:
                             />
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xs text-neutral-400">W</span>
                         </div>
-                        <button 
-                            onClick={() => setLocked(!locked)} 
-                            className="p-1 rounded-md hover:bg-white/10 transition-colors"
-                            title={locked ? "Unlock aspect ratio" : "Lock aspect ratio"}
-                        >
-                            {locked ? (
-                                <LockIcon className="h-4 w-4 text-green-400" />
-                            ) : (
-                                <UnlockIcon className="h-4 w-4 text-neutral-400" />
-                            )}
-                        </button>
+                        <span className="text-xs text-neutral-400">x</span>
                         <div className="relative flex-1">
                             <Input 
                                 type="number" 

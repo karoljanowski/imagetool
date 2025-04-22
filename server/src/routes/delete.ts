@@ -6,6 +6,6 @@ const router = Router();
 const upload = multer();
 
 router.delete("/deleteAll/:token", upload.none(), deleteAllFilesController);
-router.delete("/delete/:token", upload.none(), deleteFileController);
+router.delete("/delete/:token/:fileId", upload.none(), deleteFileController);
 
 export default router;

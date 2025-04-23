@@ -65,7 +65,7 @@ const FilesList = () => {
     useEffect(() => {
         fetchFiles();
 
-        const ws = new WebSocket(`ws://localhost:3001`);
+        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`);
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.type === 'upload_complete' || data.type === 'upload_init' || data.type === 'upload_error') {

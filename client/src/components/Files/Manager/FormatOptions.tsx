@@ -11,7 +11,7 @@ const FormatOptions = ({ setFiles, selectedFilesIds }: {
     
     const formats = [
         { id: 'png', label: 'PNG', description: 'Lossless, supports transparency' },
-        { id: 'jpeg', label: 'JPEG', description: 'Smaller file size, no transparency' },
+        { id: 'jpg', label: 'JPG', description: 'Smaller file size, no transparency' },
         { id: 'webp', label: 'WEBP', description: 'Modern format, great compression' },
         { id: 'avif', label: 'AVIF', description: 'Next-gen format, best compression' }
     ];

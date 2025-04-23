@@ -7,7 +7,7 @@ import FileItem from "./FileItem";
 import { Button } from "../ui/button";
 import { deleteAllFiles } from "@/lib/delete";
 import { toast } from "sonner";
-
+import getToken from "@/lib/token";
 
 const FilesList = () => {
     const [files, setFiles] = useState<File[]>([]);
@@ -15,8 +15,6 @@ const FilesList = () => {
     const [isDeletingAll, setIsDeletingAll] = useState(false);
     const managerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
-
-    console.log(files);
 
     const calculateFilesListHeight = () => {
         const listFromTop = listRef.current?.offsetTop;
@@ -68,6 +66,9 @@ const FilesList = () => {
         const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`);
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            const token = getToken();
+            if (data.token !== token) return;
+
             if (data.type === 'upload_complete' || data.type === 'upload_init' || data.type === 'upload_error') {
                 fetchFiles();
             }

@@ -43,6 +43,7 @@ const initUploadController = async (req: Request, res: Response) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify({
                     type: 'upload_init',
+                    token: token
                 }));
             }
         });
@@ -61,6 +62,9 @@ const uploadController = async (req: Request, res: Response) => {
         const fileId = req.body.fileId;
 
         if (!fileBuffer || !fileId) {
+            if (fileId) {
+                saveError(fileId);
+            }
             res.status(400).json({
                 message: "No file or fileId"
             });
@@ -125,11 +129,18 @@ const uploadController = async (req: Request, res: Response) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify({
                     type: 'upload_complete',
+                    token: file.token
                 }));
             }
         });
     } catch (error) {
         console.error('Error in uploadController:', error);
+
+        const fileId = req.body.fileId;
+        if (fileId) {
+            saveError(fileId);
+        }
+        
         wss.clients.forEach((client: WebSocket) => {
             if (client.readyState === WebSocket.OPEN) {
                 client.send(JSON.stringify({
@@ -137,10 +148,22 @@ const uploadController = async (req: Request, res: Response) => {
                 }));
             }
         });
+
         res.status(500).json({
             message: "Internal server error"
         });
     }
+}
+
+const saveError = async (fileId: string) => {
+    await db.file.update({
+        where: {
+            id: fileId
+        },
+        data: {
+            status: "ERROR"
+        }
+    });
 }
 
 export { uploadController, initUploadController, upload };

@@ -39,6 +39,7 @@ enum FileStatus {
   UPLOADED
   PROCESSING
   PROCESSED
+  ERROR
 }
 
 enum FileFormat {

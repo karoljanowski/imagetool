@@ -2,7 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['imagetool-4rtb.onrender.com'],
+    remotePatterns: [
+      {
+        hostname: 'localhost',
+      },
+      {
+        hostname: 'imagetool-4rtb.onrender.com',
+      },
+    ],
   },
 };
 

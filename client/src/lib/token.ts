@@ -4,7 +4,7 @@ const generateToken = (): string => {
     return uuidv4();
 }
 
-const getToken = async () => {
+const getToken = () => {
     if (typeof window === 'undefined') return '';
     
     let token = localStorage.getItem("token");

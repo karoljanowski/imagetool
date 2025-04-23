@@ -21,7 +21,7 @@ const Manager = forwardRef(({ files, selectedFilesIds, setFiles }: {
                     <FormatOptions setFiles={setFiles} selectedFilesIds={selectedFilesIds} />
                 </ManagerItem>
                 <ManagerItem>
-                    <OtherOptions setFiles={setFiles} selectedFilesIds={selectedFilesIds} />
+                    <OtherOptions setFiles={setFiles} selectedFilesIds={selectedFilesIds} files={files} />
                 </ManagerItem>
                 <ManagerItem>
                     <ActionButtons files={files} selectedFilesIds={selectedFilesIds} />

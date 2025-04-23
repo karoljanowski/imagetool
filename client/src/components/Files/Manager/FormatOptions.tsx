@@ -19,7 +19,7 @@ const FormatOptions = ({ setFiles, selectedFilesIds }: {
     useEffect(() => {
         setFiles(prevFiles => prevFiles.map(file => {
             if (selectedFilesIds.includes(file.id)) {
-                return { ...file, processedFormat: selectedFormat };
+                return { ...file, processedFormat: selectedFormat, processedRemovedBackground: selectedFormat === 'jpg' ? false : file.processedRemovedBackground };
             }
             return file;
         }));

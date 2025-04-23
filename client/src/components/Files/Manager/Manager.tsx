@@ -8,7 +8,7 @@ import { forwardRef, ForwardedRef, Dispatch, SetStateAction } from "react";
 
 const Manager = forwardRef(({ files, selectedFilesIds, setFiles }: { 
     files: File[],
-    selectedFilesIds: String[],
+    selectedFilesIds: string[], 
     setFiles: Dispatch<SetStateAction<File[]>>
 }, ref: ForwardedRef<HTMLDivElement>) => {
     return (
@@ -30,5 +30,7 @@ const Manager = forwardRef(({ files, selectedFilesIds, setFiles }: {
         </div>
     )
 })
+
+Manager.displayName = "Manager";
 
 export default Manager; 

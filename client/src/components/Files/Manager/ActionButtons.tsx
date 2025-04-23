@@ -3,7 +3,7 @@ import { PlayIcon } from "lucide-react";
 import { File } from "@/lib/types/file";
 import processFile from "@/lib/process";
 
-const ActionButtons = ({ files, selectedFilesIds }: { files: File[], selectedFilesIds: String[] }) => {
+const ActionButtons = ({ files, selectedFilesIds }: { files: File[], selectedFilesIds: string[] }) => {
 
     const handleProcess = () => {
         files.forEach(async (file) => {

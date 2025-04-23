@@ -1,5 +1,5 @@
 'use client'
-import { ArrowUpIcon, SparklesIcon } from "lucide-react";
+import { SparklesIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "../ui/button";
 import Link from "next/link";
@@ -82,7 +82,7 @@ const HeroStats = () => {
             transition={{ delay: 0.4, duration: 0.5 }}
             className="flex items-center gap-8"
         >
-            {stats.map((stat, index) => (
+            {stats.map(stat => (
                 <div key={stat.label} className="flex flex-col">
                     <span className="text-2xl font-bold text-white">{stat.value}</span>
                     <span className="text-sm text-gray-400">{stat.label}</span>

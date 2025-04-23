@@ -1,13 +1,11 @@
 'use client'
-import { UploadCloudIcon, ImageIcon, CheckIcon } from "lucide-react"
+import { UploadCloudIcon, CheckIcon } from "lucide-react"
 import { motion } from "motion/react"
 import { Button } from "../ui/button"
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import upload from "@/lib/upload"
 
 const DropImage = () => {
-    const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const router = useRouter();
     
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,15 +53,9 @@ const DropImage = () => {
                                 />
                                 <Button variant="secondary" className="w-full" asChild>
                                     <label htmlFor="file-input" className="w-full">
-                                        {selectedFile ? selectedFile.name : "Choose file"}
+                                        Choose file
                                     </label>
                                 </Button>
-                                {selectedFile && (
-                                    <div className="text-sm text-green-400 flex items-center mt-2 sm:mt-0">
-                                        <CheckIcon className="w-4 h-4 mr-1" />
-                                        File selected
-                                    </div>
-                                )}
                             </div>
                             
                             <div className="mt-8 w-full">

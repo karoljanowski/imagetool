@@ -1,4 +1,4 @@
-import { ArrowRightIcon, CheckCircleIcon, FileCog2Icon, FileIcon, ImageUpscale, Loader2Icon, TrashIcon, XCircleIcon, DatabaseIcon, CheckIcon, XIcon, DownloadIcon } from "lucide-react"
+import { ArrowRightIcon, CheckCircleIcon, FileCog2Icon, ImageUpscale, Loader2Icon, TrashIcon, CheckIcon, XIcon, DownloadIcon } from "lucide-react"
 import Image from "next/image"
 import { File, FileStatus } from "@/lib/types/file"
 import { useState } from "react"
@@ -9,8 +9,8 @@ import { toast } from "sonner"
 import Link from "next/link"
 interface FileItemProps {
     file: File;
-    selectedFilesIds: String[];
-    setSelectedFilesIds: (filesIds: String[]) => void;
+    selectedFilesIds: string[];
+    setSelectedFilesIds: (filesIds: string[]) => void;
     fetchFiles: () => void;
 }
 

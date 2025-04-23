@@ -1,8 +1,6 @@
-import { useState } from "react";
 import HeroTop from "./HeroTop";
 import DropImage from "./DropImage";
 import Features from "./Features";
-import Image from "next/image";
 
 const Hero = () => {
     return (

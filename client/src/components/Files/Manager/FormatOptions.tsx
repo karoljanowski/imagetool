@@ -5,7 +5,7 @@ import { File } from "@/lib/types/file";
 
 const FormatOptions = ({ setFiles, selectedFilesIds }: { 
     setFiles: Dispatch<SetStateAction<File[]>>, 
-    selectedFilesIds: String[]
+    selectedFilesIds: string[]
 }) => {
     const [selectedFormat, setSelectedFormat] = useState<string>('png');
     
@@ -23,7 +23,7 @@ const FormatOptions = ({ setFiles, selectedFilesIds }: {
             }
             return file;
         }));
-    }, [selectedFormat, selectedFilesIds]);
+    }, [selectedFormat, selectedFilesIds, setFiles]);
 
     return (
         <div className="flex flex-col gap-2 w-full">

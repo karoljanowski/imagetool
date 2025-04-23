@@ -7,7 +7,7 @@ import { Dispatch, SetStateAction } from "react";
 
 const OtherOptions = ({ setFiles, selectedFilesIds }: { 
     setFiles: Dispatch<SetStateAction<File[]>>, 
-    selectedFilesIds: String[]
+    selectedFilesIds: string[]
 }) => {
 
     const handleRemoveBackground = (checked: boolean) => {

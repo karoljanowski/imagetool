@@ -11,7 +11,7 @@ import { toast } from "sonner";
 
 const FilesList = () => {
     const [files, setFiles] = useState<File[]>([]);
-    const [selectedFilesIds, setSelectedFilesIds] = useState<String[]>([]);
+    const [selectedFilesIds, setSelectedFilesIds] = useState<string[]>([]);
     const [isDeletingAll, setIsDeletingAll] = useState(false);
     const managerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);

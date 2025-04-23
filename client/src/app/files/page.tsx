@@ -1,8 +1,6 @@
-import Background from "@/components/Background";
 import Drop from "@/components/Drop";
 import FilesList from "@/components/Files/FilesList";
 import Header from "@/components/Header";
-import Hero from "@/components/Hero/Hero";
 
 const Files = () => {
     return (

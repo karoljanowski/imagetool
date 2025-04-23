@@ -44,7 +44,7 @@ const Drop = () => {
             window.removeEventListener("dragover", handleDragOver);
             window.removeEventListener("dragleave", handleDragLeave);
         }
-    }, []);
+    });
     
     return (
         <AnimatePresence>

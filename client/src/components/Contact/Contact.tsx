@@ -1,6 +1,6 @@
 'use client'
 import { motion } from "motion/react";
-import { GithubIcon, LinkedinIcon, MailIcon, ExternalLinkIcon, ArrowRightIcon } from "lucide-react";
+import { GithubIcon, LinkedinIcon, MailIcon, ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 
 const Contact = () => {
@@ -21,7 +21,7 @@ const Contact = () => {
                         Connect with the Developer
                     </h2>
                     <p className="text-lg text-gray-400 max-w-2xl">
-                        I'm always open to discussing new projects, opportunities, or sharing insights about this learning project.
+                        I&apos;m always open to discussing new projects, opportunities, or sharing insights about this learning project.
                     </p>
                 </div>
                 <div className="grid grid-cols-3 gap-4">

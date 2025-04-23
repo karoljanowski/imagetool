@@ -7,7 +7,7 @@ import { File } from "@/lib/types/file";
 
 const ResizeOptions = ({ setFiles, selectedFilesIds }: { 
     setFiles: Dispatch<SetStateAction<File[]>>, 
-    selectedFilesIds: String[]
+    selectedFilesIds: string[]
 }) => {
     const [width, setWidth] = useState<number | ''>('');
     const [height, setHeight] = useState<number | ''>('');
@@ -29,7 +29,7 @@ const ResizeOptions = ({ setFiles, selectedFilesIds }: {
     
     useEffect(() => {
         handleResize();
-    }, [width, height]);
+    }, [width, height, handleResize]);
 
     useEffect(() => {
         if (selectedFilesIds.length > 0) {

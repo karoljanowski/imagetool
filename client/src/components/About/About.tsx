@@ -1,7 +1,7 @@
 'use client'
 import Image from "next/image";
 import { motion } from "motion/react";
-import { ServerIcon, BrainIcon, CodeIcon, GraduationCapIcon } from "lucide-react";
+import { ServerIcon, CodeIcon, GraduationCapIcon } from "lucide-react";
 
 const About = () => {
     return (

@@ -1,5 +1,6 @@
 export type File = {
     id: string;
+    token: string;
     url: string;
     status: FileStatus;
     name: string;
@@ -7,15 +8,12 @@ export type File = {
     originalWidth?: number;
     originalHeight?: number;
     originalFormat?: string;
+    originalPath?: string;
+    processedFormat?: string;
+    processedWidth?: number;
+    processedHeight?: number;
+    processedRemovedBackground?: boolean;
+    processedCompressed?: boolean;
+    processedPath?: string;
 }
-
-export type NewFilesSettings = {
-    fileId: string;
-    newFormat: string;
-    newWidth: number;
-    newHeight: number;
-    removeBackground: boolean;
-    compress: boolean;
-}
-
 export type FileStatus = 'UPLOADING' | 'UPLOADED' | 'PROCESSING' | 'PROCESSED';

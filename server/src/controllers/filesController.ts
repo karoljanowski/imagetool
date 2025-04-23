@@ -23,13 +23,20 @@ const getFilesController = async (req: Request, res: Response) => {
         const filesList = files.map(file => {
             return {
                 id: file.id,
-                url: `${process.env.SERVER_URL}/api/file/${token}/${file.id}.${file.format}`,
+                token: file.token,
+                url: `${process.env.SERVER_URL}/api/file/${token}/${file.id}.${file.originalFormat}`,
                 status: file.status,
                 name: file.name,
-                size: file.size,
-                originalFormat: file.format,
-                originalWidth: file.width,
-                originalHeight: file.height,
+                size: file.originalSize,
+                originalFormat: file.originalFormat,
+                originalWidth: file.originalWidth,
+                originalHeight: file.originalHeight,
+                processedFormat: file.processedFormat,
+                processedWidth: file.processedWidth,
+                processedHeight: file.processedHeight,
+                processedRemovedBackground: file.processedRemovedBackground,
+                processedCompressed: file.processedCompressed,
+                processedPath: file.processedPath
             }
         });
 

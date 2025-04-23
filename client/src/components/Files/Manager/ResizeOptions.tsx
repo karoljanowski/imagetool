@@ -1,14 +1,13 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { LockIcon, UnlockIcon, ScalingIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { NewFilesSettings, File } from "@/lib/types/file";
+import { ScalingIcon } from "lucide-react";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
+import { File } from "@/lib/types/file";
 
-const ResizeOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }: { 
-    setNewFilesSettings: (newFilesSettings: NewFilesSettings[]) => void, 
-    selectedFiles: File[],
-    newFilesSettings: NewFilesSettings[]
+const ResizeOptions = ({ setFiles, selectedFilesIds }: { 
+    setFiles: Dispatch<SetStateAction<File[]>>, 
+    selectedFilesIds: String[]
 }) => {
     const [width, setWidth] = useState<number | ''>('');
     const [height, setHeight] = useState<number | ''>('');
@@ -16,18 +15,16 @@ const ResizeOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }:
     const handleResize = () => {
         if (!width && !height) return;
         
-        const updatedSettings = newFilesSettings.map(setting => {
-            if (selectedFiles.some(file => file.id === setting.fileId)) {
+        setFiles((prevFiles: File[]) => prevFiles.map(file => {
+            if (selectedFilesIds.includes(file.id)) {
                 return {
-                    ...setting,
-                    newWidth: width || setting.newWidth,
-                    newHeight: height || setting.newHeight
+                    ...file,
+                    processedWidth: width || file.processedWidth,
+                    processedHeight: height || file.processedHeight
                 };
             }
-            return setting;
-        });
-
-        setNewFilesSettings(updatedSettings);
+            return file;
+        }));
     }
     
     useEffect(() => {
@@ -35,11 +32,11 @@ const ResizeOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }:
     }, [width, height]);
 
     useEffect(() => {
-        if (selectedFiles.length > 0) {
+        if (selectedFilesIds.length > 0) {
             setWidth('');
             setHeight('');
         }
-    }, [selectedFiles]);
+    }, [selectedFilesIds]);
 
     return (
         <div className="flex flex-col gap-2 w-full">

@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { FileCog2Icon } from "lucide-react"
-import { useEffect, useState } from "react"
-import { NewFilesSettings, File } from "@/lib/types/file";
+import { useEffect, useState, Dispatch, SetStateAction } from "react"
+import { File } from "@/lib/types/file";
 
-const FormatOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }: { 
-    setNewFilesSettings: (newFilesSettings: NewFilesSettings[]) => void, 
-    selectedFiles: File[],
-    newFilesSettings: NewFilesSettings[]
+const FormatOptions = ({ setFiles, selectedFilesIds }: { 
+    setFiles: Dispatch<SetStateAction<File[]>>, 
+    selectedFilesIds: String[]
 }) => {
     const [selectedFormat, setSelectedFormat] = useState<string>('png');
     
@@ -18,14 +17,13 @@ const FormatOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }:
     ];
 
     useEffect(() => {
-        const updatedSettings = newFilesSettings.map(setting => {
-            if (selectedFiles.some(file => file.id === setting.fileId)) {
-                return { ...setting, newFormat: selectedFormat };
+        setFiles(prevFiles => prevFiles.map(file => {
+            if (selectedFilesIds.includes(file.id)) {
+                return { ...file, processedFormat: selectedFormat };
             }
-            return setting;
-        });
-        setNewFilesSettings(updatedSettings);
-    }, [selectedFormat]);
+            return file;
+        }));
+    }, [selectedFormat, selectedFilesIds]);
 
     return (
         <div className="flex flex-col gap-2 w-full">

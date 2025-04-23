@@ -3,7 +3,7 @@ import { uploadController, upload, initUploadController } from "../controllers/u
 
 const router: Router = express.Router();
 
-router.post("/upload", upload.single("file"), uploadController);
 router.post("/init-upload", upload.none(), initUploadController);
+router.post("/upload", upload.single("file"), uploadController);
 
 export default router; 

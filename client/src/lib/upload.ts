@@ -8,7 +8,7 @@ const upload = async (file: File) => {
     // step 1: init upload
     const initFormData = new FormData();
     initFormData.append('token', token);
-    initFormData.append("fileName", file.name);
+    initFormData.append("fileName", file.name.split(".")[0]);
     initFormData.append("format", format);
 
     const initUploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/init-upload`, initFormData);

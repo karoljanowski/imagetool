@@ -18,18 +18,18 @@ model File {
   id        String   @id @default(uuid())
   token     String
   name      String
-  format    FileFormat
   status    FileStatus
-  size      Int?
-  width     Int?
-  height    Int?
-  path      String?
+  originalFormat    FileFormat
+  originalSize      Int?
+  originalWidth     Int?
+  originalHeight    Int?
+  originalPath      String?
   // Processed file
-  processedPath String?
-  processedWidth Int?
-  processedHeight Int?
   processedFormat FileFormat?
   processedSize Int?
+  processedWidth Int?
+  processedHeight Int?
+  processedPath String?
   processedRemovedBackground Boolean?
   processedCompressed Boolean?
 }

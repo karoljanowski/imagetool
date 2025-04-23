@@ -2,7 +2,7 @@
 import getFiles from "@/lib/files";
 import { useEffect, useState, useRef } from "react";
 import Manager from "./Manager/Manager";
-import { File, NewFilesSettings } from "@/lib/types/file";
+import { File } from "@/lib/types/file";
 import FileItem from "./FileItem";
 import { Button } from "../ui/button";
 import { deleteAllFiles } from "@/lib/delete";
@@ -11,11 +11,12 @@ import { toast } from "sonner";
 
 const FilesList = () => {
     const [files, setFiles] = useState<File[]>([]);
-    const [newFilesSettings, setNewFilesSettings] = useState<NewFilesSettings[]>([]);
-    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [selectedFilesIds, setSelectedFilesIds] = useState<String[]>([]);
     const [isDeletingAll, setIsDeletingAll] = useState(false);
     const managerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
+
+    console.log(files);
 
     const calculateFilesListHeight = () => {
         const listFromTop = listRef.current?.offsetTop;
@@ -27,17 +28,25 @@ const FilesList = () => {
     const fetchFiles = async () => {
         const data = await getFiles();
         if (data.success) {
-            setFiles(data.filesList);
+            setFiles(data.filesList.map((file: File) => ({
+                ...file,
+                processedFormat: file.processedFormat || file.originalFormat,
+                processedWidth: file.processedWidth || file.originalWidth,
+                processedHeight: file.processedHeight || file.originalHeight,
+                processedRemovedBackground: file.processedRemovedBackground || false,
+                processedCompressed: file.processedCompressed || false,
+                processedPath: file.processedPath || file.originalPath
+            })));
         } else {
             toast.error(data.message);
         }
     }
 
     const handleSelectButton = () => {
-        if (selectedFiles.length === files.length) {
-            setSelectedFiles([]);
+        if (selectedFilesIds.length === files.length) {
+            setSelectedFilesIds([]);
         } else {
-            setSelectedFiles(files);
+            setSelectedFilesIds(files.map((file) => file.id));
         }
     }
 
@@ -72,21 +81,6 @@ const FilesList = () => {
         }
     }, []);
 
-    useEffect(() => {
-        files.forEach((file) => {
-            if (file.status === 'UPLOADED') {
-                setNewFilesSettings((prev) => [...prev, { 
-                    fileId: file.id, 
-                    newFormat: file.originalFormat || '', 
-                    newWidth: file.originalWidth || 0, 
-                    newHeight: file.originalHeight || 0, 
-                    removeBackground: false, 
-                    compress: false 
-                }]);
-            }
-        });
-    }, [files]);
-
     return (
         <>
             <div className="container mx-auto px-4">
@@ -97,7 +91,7 @@ const FilesList = () => {
                     </div>
                     <div className="flex gap-2">
                         <Button onClick={handleSelectButton}>
-                            {selectedFiles.length === files.length ? 'Deselect all' : 'Select all'}
+                            {selectedFilesIds.length === files.length ? 'Deselect all' : 'Select all'}
                         </Button>
                         <Button variant="destructive" onClick={handleDeleteAll} disabled={isDeletingAll}>
                             {isDeletingAll ? 'Deleting...' : 'Delete all'}
@@ -108,12 +102,12 @@ const FilesList = () => {
                     style={{ height: calculateFilesListHeight() }}>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-6">
                         {files && files.map((file) => (
-                            <FileItem key={file.id} file={file} newFilesSettings={newFilesSettings} selectedFiles={selectedFiles} setSelectedFiles={setSelectedFiles} fetchFiles={fetchFiles} />
+                            <FileItem key={file.id} file={file} selectedFilesIds={selectedFilesIds} setSelectedFilesIds={setSelectedFilesIds} fetchFiles={fetchFiles} />
                         ))}
                     </div>
                 </div>
             </div>
-            <Manager ref={managerRef} selectedFiles={selectedFiles} setNewFilesSettings={setNewFilesSettings} newFilesSettings={newFilesSettings} />
+            <Manager ref={managerRef} files={files} selectedFilesIds={selectedFilesIds} setFiles={setFiles} />
         </>
     )
 }

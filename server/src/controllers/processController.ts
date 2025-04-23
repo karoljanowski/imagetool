@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
-import { File as FileType, FileFormat } from "../generated/prisma";
+import { File as FileType, FileFormat, FileStatus } from "../generated/prisma";
 import db from "../db";
 import fs from "fs";
 import sharp from "sharp";
 import path from "path";
-// HERE WHOLE CODE TO REWRITE
+import { wss } from "../server";
+import WebSocket from "ws";
 
 const processController = async (req: Request, res: Response) => {
     try {
-        const { token, fileId, format, backgroundRemoval, compress, width, height } = req.body;
+        const { token, fileId, newFormat, removeBackground, compress, newWidth, newHeight } = req.body;
 
         const file = await db.file.findUnique({
             where: {
@@ -23,17 +24,15 @@ const processController = async (req: Request, res: Response) => {
             })
             return;
         }
-        
-        const currentFilePath = `./uploads/${token}/${file.id}.${file.format}`;
 
-        if (!fs.existsSync(currentFilePath)) {
+        if (!file.originalPath) {
             res.status(404).json({
                 message: "File not found"
             })
             return;
         }
 
-        const outputBuffer = await processFile(res, file, format, backgroundRemoval, compress, currentFilePath, width, height);
+        const outputBuffer = await processFile(res, file, file.originalPath, newFormat, removeBackground, compress, newWidth, newHeight);
 
         if (!outputBuffer) {
             res.status(400).json({
@@ -42,7 +41,19 @@ const processController = async (req: Request, res: Response) => {
             return;
         }
 
-        await saveFile(file, currentFilePath, outputBuffer, format, width, height);
+        await saveFile(file, outputBuffer, newFormat, newWidth, newHeight, removeBackground, compress);
+
+        res.status(200).json({
+            message: "File processed successfully"
+        })
+
+        wss.clients.forEach((client: WebSocket) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({
+                    type: 'process_complete',
+                }));
+            }
+        });
 
     } catch (error) {
         console.error(error);
@@ -52,8 +63,8 @@ const processController = async (req: Request, res: Response) => {
     }
 }
 
-const processFile = async (res: Response, file: FileType, format: FileFormat, backgroundRemoval: boolean, compress: boolean, currentFilePath: string, width?: string, height?: string) => {
-    let imageBuffer = fs.readFileSync(currentFilePath);
+const processFile = async (res: Response, file: FileType, originalPath: string, newFormat: FileFormat, removeBackground: boolean, compress: boolean, newWidth?: string, newHeight?: string) => {
+    let imageBuffer = fs.readFileSync(originalPath);
     let sharpInstance = sharp(imageBuffer);
     let compression = {
         quality: 100,
@@ -69,14 +80,16 @@ const processFile = async (res: Response, file: FileType, format: FileFormat, ba
     }
 
     // background removal
-    if (backgroundRemoval && file.format !== 'jpg') {
+    if (removeBackground && file.originalFormat !== 'jpg') {
         sharpInstance = sharpInstance.removeAlpha().ensureAlpha(0);
     }
 
     // resize
-    if (width && height) {
-        if (!Number.isNaN(parseInt(width)) && !Number.isNaN(parseInt(height)) && parseInt(width) > 0 && parseInt(height) > 0) {
-            sharpInstance = sharpInstance.resize(parseInt(width), parseInt(height));
+    if (newWidth && newHeight) {
+        const width = parseInt(newWidth);
+        const height = parseInt(newHeight);
+        if (Number.isInteger(width) && Number.isInteger(height) && width > 0 && height > 0) {
+            sharpInstance = sharpInstance.resize(width, height);
         } else {
             res.status(400).json({
                 message: "Invalid width or height"
@@ -86,14 +99,14 @@ const processFile = async (res: Response, file: FileType, format: FileFormat, ba
     }
     
     // format
-    if (format && ['jpg', 'png', 'webp', 'avif'].includes(format)) {
-        if (format === 'jpg') {
+    if (newFormat && ['jpg', 'png', 'webp', 'avif'].includes(newFormat)) {
+        if (newFormat === 'jpg') {
             sharpInstance = sharpInstance.jpeg({ quality: compression.quality });
-        } else if (format === 'png') {
+        } else if (newFormat === 'png') {
             sharpInstance = sharpInstance.png({ compressionLevel: compression.compressionLevel });
-        } else if (format === 'webp') {
+        } else if (newFormat === 'webp') {
             sharpInstance = sharpInstance.webp({ quality: compression.quality });
-        } else if (format === 'avif') {
+        } else if (newFormat === 'avif') {
             sharpInstance = sharpInstance.avif({ quality: compression.quality });
         }
     }
@@ -101,7 +114,7 @@ const processFile = async (res: Response, file: FileType, format: FileFormat, ba
     return sharpInstance.toBuffer();
 }
 
-const saveFile = async (file: FileType, currentFilePath: string, buffer: Buffer, format: FileFormat, width?: number, height?: number) => {
+const saveFile = async (file: FileType, buffer: Buffer, format: FileFormat, newWidth?: string, newHeight?: string, removeBackground?: string, compress?: string) => {
     const __dirname = path.resolve();
     const processedDir = path.join(__dirname, "processed", file.token);
 
@@ -109,22 +122,73 @@ const saveFile = async (file: FileType, currentFilePath: string, buffer: Buffer,
         fs.mkdirSync(processedDir, { recursive: true });
     }
 
-    const fileName = `${file.id}${file.name}.${format ?? file.format}`;
+    const fileName = `${file.id}.${format ?? file.originalFormat}`;
     const filePath = path.join(processedDir, fileName);
 
     fs.writeFileSync(filePath, buffer);
+
+    // update database
+    const updateData: {
+        status: FileStatus;
+        processedFormat?: FileFormat;
+        processedWidth?: number;
+        processedHeight?: number;
+        processedPath?: string;
+        processedSize?: number;
+        processedRemovedBackground?: boolean;
+        processedCompressed?: boolean;
+    } = {
+        status: 'PROCESSED'
+    };
+
+    // update format
+    if (format) {
+        updateData.processedFormat = format as FileFormat;
+    } else {
+        updateData.processedFormat = file.originalFormat as FileFormat;
+    }
+
+    // update width
+    if (newWidth) {
+        updateData.processedWidth = parseInt(newWidth);
+    } else if (file.originalWidth) {
+        updateData.processedWidth = file.originalWidth;
+    }
+
+    // update height
+    if (newHeight) {
+        updateData.processedHeight = parseInt(newHeight);
+    } else if (file.originalHeight) {
+        updateData.processedHeight = file.originalHeight;
+    }
+
+    // update removed background
+    if (removeBackground === 'true') {
+        updateData.processedRemovedBackground = true;
+    } else {
+        updateData.processedRemovedBackground = false;
+    }
+
+    // update compressed
+    if (compress === 'true') {
+        updateData.processedCompressed = true;
+    } else {
+        updateData.processedCompressed = false;
+    }
+
+    // update path
+    updateData.processedPath = filePath;
+
+    // update size
+    updateData.processedSize = buffer.length;
+
+    console.log(updateData);
 
     await db.file.update({
         where: {
             id: file.id
         },
-        data: {
-            processedPath: filePath,
-            processedWidth: width ?? file.width,
-            processedHeight: height ?? file.height,
-            processedFormat: format ?? file.format,
-            processedSize: buffer.length
-        }
+        data: updateData
     })
 }
 

@@ -4,5 +4,6 @@
 /src/generated
 
 /uploads
+/processed
 
 .env

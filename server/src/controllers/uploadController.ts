@@ -30,7 +30,7 @@ const initUploadController = async (req: Request, res: Response) => {
                 token,
                 name: fileName,
                 status: "UPLOADING",
-                format
+                originalFormat: format as FileFormat,
             }
         });
         
@@ -56,7 +56,7 @@ const initUploadController = async (req: Request, res: Response) => {
 
 const uploadController = async (req: Request, res: Response) => {
     try {
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         const fileBuffer = req.file;
         const fileId = req.body.fileId;
 
@@ -76,6 +76,13 @@ const uploadController = async (req: Request, res: Response) => {
         if (!file) {
             res.status(404).json({
                 message: "File not found"
+            });
+            return;
+        }
+
+        if (file.status === "UPLOADED") {
+            res.status(400).json({
+                message: "File is already uploaded"
             });
             return;
         }
@@ -101,15 +108,16 @@ const uploadController = async (req: Request, res: Response) => {
             },
             data: {
                 status: "UPLOADED",
-                format: metadata.format as FileFormat,
-                size: fileBuffer.size,
-                width: metadata.width,
-                height: metadata.height,
-                path: filePath
+                originalFormat: metadata.format as FileFormat,
+                originalSize: fileBuffer.size,
+                originalWidth: metadata.width,
+                originalHeight: metadata.height,
+                originalPath: filePath
             }
         });
 
         res.status(200).json({
+            success: true,
             message: "File uploaded successfully"
         });
 

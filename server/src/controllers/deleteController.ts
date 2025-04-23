@@ -47,7 +47,7 @@ const deleteFileController = async (req: Request, res: Response) => {
             }
         });
         
-        if (!file || !file.path) {
+        if (!file || !file.originalPath) {
             res.status(404).json({
                 success: false,
                 message: "File not found"
@@ -55,7 +55,7 @@ const deleteFileController = async (req: Request, res: Response) => {
             return;
         }
 
-        fs.unlinkSync(file.path);
+        fs.unlinkSync(file.originalPath);
         await db.file.delete({
             where: {
                 id: fileId

@@ -1,27 +1,29 @@
 import axios from "axios";
 import getToken from "./token";
+import { File } from "./types/file";
 
-interface ProcessFileProps {
-    fileId: string;
-    width: number;
-    height: number;
-    format: string;
-    compress: boolean;
-    removeBackground: boolean;
-}
-
-const processFile = async ({fileId, width, height, format, compress, removeBackground}: ProcessFileProps) => {
+const processFile = async (file: File) => {
     const token = await getToken();
     const formData = new FormData();
 
-    formData.append("fileId", fileId);
-    formData.append("width", width.toString());
-    formData.append("height", height.toString());
-    formData.append("format", format);
-    formData.append("compress", compress.toString());
-    formData.append("removeBackground", removeBackground.toString());
+    formData.append("fileId", file.id);
+    if (file.processedWidth) {
+        formData.append("newWidth", file.processedWidth.toString());
+    }
+    if (file.processedHeight) {
+        formData.append("newHeight", file.processedHeight.toString());
+    }
+    if (file.processedFormat) {
+        formData.append("newFormat", file.processedFormat);
+    }
+    if (file.processedCompressed) {
+        formData.append("compress", file.processedCompressed.toString());
+    }
+    if (file.processedRemovedBackground) {
+        formData.append("removeBackground", file.processedRemovedBackground.toString());
+    }
 
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/process`, formData, {
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/process`, formData, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

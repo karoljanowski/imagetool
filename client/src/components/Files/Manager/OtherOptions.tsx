@@ -1,33 +1,31 @@
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SettingsIcon } from "lucide-react";
-import { NewFilesSettings, File } from "@/lib/types/file";
+import { File } from "@/lib/types/file";
+import { Dispatch, SetStateAction } from "react";
 
 
-const OtherOptions = ({ setNewFilesSettings, selectedFiles, newFilesSettings }: { 
-    setNewFilesSettings: (newFilesSettings: NewFilesSettings[]) => void, 
-    selectedFiles: File[],
-    newFilesSettings: NewFilesSettings[]
+const OtherOptions = ({ setFiles, selectedFilesIds }: { 
+    setFiles: Dispatch<SetStateAction<File[]>>, 
+    selectedFilesIds: String[]
 }) => {
 
     const handleRemoveBackground = (checked: boolean) => {
-        const updatedSettings = newFilesSettings.map(setting => {
-            if (selectedFiles.some(file => file.id === setting.fileId)) {
-                return { ...setting, removeBackground: checked };
+        setFiles(prevFiles => prevFiles.map(file => {
+            if (selectedFilesIds.includes(file.id)) {
+                return { ...file, processedRemovedBackground: checked };
             }
-            return setting;
-        });
-        setNewFilesSettings(updatedSettings);
+            return file;
+        }));
     }
 
     const handleCompress = (checked: boolean) => {
-        const updatedSettings = newFilesSettings.map(setting => {
-            if (selectedFiles.some(file => file.id === setting.fileId)) {
-                return { ...setting, compress: checked };
+        setFiles(prevFiles => prevFiles.map(file => {
+            if (selectedFilesIds.includes(file.id)) {
+                return { ...file, processedCompressed: checked };
             }
-            return setting;
-        });
-        setNewFilesSettings(updatedSettings);
+            return file;
+        }));
     }
     
     return (

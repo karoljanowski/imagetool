@@ -9,12 +9,15 @@ const processController = async (req: Request, res: Response) => {
     try {
         const { token, fileId, newFormat, removeBackground, compress, newWidth, newHeight } = req.body;
 
-        const file = await db.file.findUnique({
+        const file = await db.file.update({
             where: {
                 id: fileId,
                 token
+            },
+            data: {
+                status: 'PROCESSING'
             }
-        })        
+        })
         
         if (!file) {
             res.status(404).json({

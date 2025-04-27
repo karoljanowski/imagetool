@@ -33,6 +33,7 @@ const processFile = async (file: File, setStatus: (fileId: string, status: FileS
     })
     .catch(() => {
         toast.error("Failed to process file");
+        fetchFiles();
     });
 }
 export default processFile;

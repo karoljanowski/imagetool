@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import Manager from "./Manager/Manager";
 import FileItem from "./FileItem";
 import { Button } from "../ui/button";

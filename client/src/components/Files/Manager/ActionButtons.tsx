@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { PlayIcon } from "lucide-react";
-import { File } from "@/lib/types/file";
 import processFile from "@/lib/process";
+import { useFiles } from "@/lib/context/FileContext";
 
-const ActionButtons = ({ files, selectedFilesIds }: { files: File[], selectedFilesIds: string[] }) => {
+const ActionButtons = () => {
+    const { files, selectedFilesIds } = useFiles();
 
     const handleProcess = () => {
         files.forEach(async (file) => {

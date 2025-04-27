@@ -4,21 +4,27 @@ import db from "../db";
 import fs from "fs";
 import sharp from "sharp";
 import path from "path";
-import { wss } from "../server";
-import WebSocket from "ws";
+import { sendMessageToAllClients } from "../lib/wss";
 
 const processController = async (req: Request, res: Response) => {
     try {
         const { token, fileId, newFormat, removeBackground, compress, newWidth, newHeight } = req.body;
 
-        const file = await db.file.findUnique({
+        sendMessageToAllClients('process_started', token);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        const file = await db.file.update({
             where: {
                 id: fileId,
                 token
+            },
+            data: {
+                status: 'PROCESSING'
             }
         })
         
         if (!file) {
+            sendMessageToAllClients('process_error');
             res.status(404).json({
                 message: "File not found"
             })
@@ -26,6 +32,7 @@ const processController = async (req: Request, res: Response) => {
         }
 
         if (!file.originalPath) {
+            sendMessageToAllClients('process_error');
             res.status(404).json({
                 message: "File not found"
             })
@@ -35,6 +42,7 @@ const processController = async (req: Request, res: Response) => {
         const outputBuffer = await processFile(res, file, file.originalPath, newFormat, removeBackground, compress, newWidth, newHeight);
 
         if (!outputBuffer) {
+            sendMessageToAllClients('process_error');
             res.status(400).json({
                 message: "Invalid output buffer"
             })
@@ -47,13 +55,7 @@ const processController = async (req: Request, res: Response) => {
             message: "File processed successfully"
         })
 
-        wss.clients.forEach((client: WebSocket) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({
-                    type: 'process_complete',
-                }));
-            }
-        });
+        sendMessageToAllClients('process_complete', token);
 
     } catch (error) {
         console.error(error);
@@ -80,7 +82,7 @@ const processFile = async (res: Response, file: FileType, originalPath: string, 
     }
 
     // background removal
-    if (removeBackground && file.originalFormat !== 'jpg') {
+    if (removeBackground && file.originalFormat !== 'jpeg') {
         sharpInstance = sharpInstance.removeAlpha().ensureAlpha(0);
     }
 
@@ -99,8 +101,8 @@ const processFile = async (res: Response, file: FileType, originalPath: string, 
     }
     
     // format
-    if (newFormat && ['jpg', 'png', 'webp', 'avif'].includes(newFormat)) {
-        if (newFormat === 'jpg') {
+    if (newFormat) {
+        if (newFormat === 'jpeg') {
             sharpInstance = sharpInstance.jpeg({ quality: compression.quality });
         } else if (newFormat === 'png') {
             sharpInstance = sharpInstance.png({ compressionLevel: compression.compressionLevel });
@@ -108,6 +110,11 @@ const processFile = async (res: Response, file: FileType, originalPath: string, 
             sharpInstance = sharpInstance.webp({ quality: compression.quality });
         } else if (newFormat === 'avif') {
             sharpInstance = sharpInstance.avif({ quality: compression.quality });
+        } else {
+            res.status(400).json({
+                message: "Invalid format"
+            })
+            return;
         }
     }
 
@@ -181,8 +188,6 @@ const saveFile = async (file: FileType, buffer: Buffer, format: FileFormat, newW
 
     // update size
     updateData.processedSize = buffer.length;
-
-    console.log(updateData);
 
     await db.file.update({
         where: {

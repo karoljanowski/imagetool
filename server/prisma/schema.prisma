@@ -44,7 +44,7 @@ enum FileStatus {
 
 enum FileFormat {
   png
-  jpg
+  jpeg
   webp
   avif
 }

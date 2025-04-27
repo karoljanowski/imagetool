@@ -5,9 +5,9 @@ import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import db from "../db";
-import { wss } from "../server";
-import { WebSocket } from "ws";
 import { FileFormat } from "../generated/prisma";
+import { sendMessageToAllClients } from "../lib/wss";
+
 const upload = multer({
     storage: multer.memoryStorage(),
 });
@@ -25,6 +25,13 @@ const initUploadController = async (req: Request, res: Response) => {
             return;
         }
 
+        if (!['jpeg', 'png', 'webp', 'avif'].includes(format)) {
+            res.status(400).json({
+                message: "Invalid format"
+            });
+            return;
+        }
+
         const file = await db.file.create({
             data: {
                 token,
@@ -34,18 +41,10 @@ const initUploadController = async (req: Request, res: Response) => {
             }
         });
         
+        sendMessageToAllClients('upload_init', token);
         res.status(200).json({
             message: "Upload initialized",
             fileId: file.id
-        });
-        
-        wss.clients.forEach((client: WebSocket) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({
-                    type: 'upload_init',
-                    token: token
-                }));
-            }
         });
     } catch (error) {
         console.error('Error in initUploadController:', error);
@@ -63,7 +62,7 @@ const uploadController = async (req: Request, res: Response) => {
 
         if (!fileBuffer || !fileId) {
             if (fileId) {
-                saveError(fileId);
+                await saveError(fileId);
             }
             res.status(400).json({
                 message: "No file or fileId"
@@ -98,10 +97,8 @@ const uploadController = async (req: Request, res: Response) => {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
 
-        const fileName = `${fileId}${path.extname(fileBuffer.originalname)}`;
-        const filePath = path.join(uploadDir, fileName);
+        const filePath = path.join(uploadDir, file.id + "." + file.originalFormat);
 
-        // Get image metadata using sharp
         const metadata = await sharp(fileBuffer.buffer).metadata();
 
         fs.writeFileSync(filePath, fileBuffer.buffer);
@@ -112,7 +109,6 @@ const uploadController = async (req: Request, res: Response) => {
             },
             data: {
                 status: "UPLOADED",
-                originalFormat: metadata.format as FileFormat,
                 originalSize: fileBuffer.size,
                 originalWidth: metadata.width,
                 originalHeight: metadata.height,
@@ -125,29 +121,16 @@ const uploadController = async (req: Request, res: Response) => {
             message: "File uploaded successfully"
         });
 
-        wss.clients.forEach((client: WebSocket) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({
-                    type: 'upload_complete',
-                    token: file.token
-                }));
-            }
-        });
+        sendMessageToAllClients('upload_complete', file.token);
     } catch (error) {
         console.error('Error in uploadController:', error);
 
         const fileId = req.body.fileId;
         if (fileId) {
-            saveError(fileId);
+            await saveError(fileId);
         }
         
-        wss.clients.forEach((client: WebSocket) => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({
-                    type: 'upload_error',
-                }));
-            }
-        });
+        sendMessageToAllClients('upload_error');
 
         res.status(500).json({
             message: "Internal server error"
@@ -156,14 +139,19 @@ const uploadController = async (req: Request, res: Response) => {
 }
 
 const saveError = async (fileId: string) => {
-    await db.file.update({
-        where: {
-            id: fileId
-        },
-        data: {
-            status: "ERROR"
-        }
-    });
+    try {
+        console.log('Saving error for file', fileId);
+        await db.file.update({
+            where: {
+                id: fileId
+            },
+            data: {
+                status: "ERROR"
+            }
+        });
+    } catch (error) {
+        console.error('Error updating file status to ERROR:', error);
+    }
 }
 
 export { uploadController, initUploadController, upload };

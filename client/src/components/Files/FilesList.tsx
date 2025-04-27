@@ -8,10 +8,11 @@ import { Button } from "../ui/button";
 import { deleteAllFiles } from "@/lib/delete";
 import { toast } from "sonner";
 import getToken from "@/lib/token";
+import { useFiles } from "@/lib/context/FileContext";
+import DropButton from "../DropButton";
 
 const FilesList = () => {
-    const [files, setFiles] = useState<File[]>([]);
-    const [selectedFilesIds, setSelectedFilesIds] = useState<string[]>([]);
+    const { files, selectedFilesIds, setSelectedFilesIds, fetchFiles } = useFiles();
     const [isDeletingAll, setIsDeletingAll] = useState(false);
     const managerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
@@ -19,25 +20,8 @@ const FilesList = () => {
     const calculateFilesListHeight = () => {
         const listFromTop = listRef.current?.offsetTop;
         const managerHeight = managerRef.current?.offsetHeight;
-        const height = `calc(100svh - ${listFromTop}px - ${managerHeight}px - 50px)`;
+        const height = `calc(100svh - ${listFromTop}px - ${managerHeight}px - 10px)`;
         return height;
-    }
-
-    const fetchFiles = async () => {
-        const data = await getFiles();
-        if (data.success) {
-            setFiles(data.filesList.map((file: File) => ({
-                ...file,
-                processedFormat: file.processedFormat || file.originalFormat,
-                processedWidth: file.processedWidth || file.originalWidth,
-                processedHeight: file.processedHeight || file.originalHeight,
-                processedRemovedBackground: file.processedRemovedBackground || false,
-                processedCompressed: file.processedCompressed || false,
-                processedPath: file.processedPath || file.originalPath
-            })));
-        } else {
-            toast.error(data.message);
-        }
     }
 
     const handleSelectButton = () => {
@@ -69,7 +53,12 @@ const FilesList = () => {
             const token = getToken();
             if (data.token !== token) return;
 
-            if (data.type === 'upload_complete' || data.type === 'upload_init' || data.type === 'upload_error') {
+            if (data.type === 'upload_complete' || 
+                data.type === 'upload_init' || 
+                data.type === 'upload_error' ||
+                data.type === 'process_complete' ||
+                data.type === 'process_error' ||
+                data.type === 'process_started') {
                 fetchFiles();
             }
             if (data.type === 'upload_error') {
@@ -79,6 +68,18 @@ const FilesList = () => {
             if (data.type === 'upload_complete') {
                 toast.success('File uploaded successfully');
             }
+
+            if (data.type === 'process_started') {
+                toast.info('Processing started');
+            }
+
+            if (data.type === 'process_complete') {
+                toast.success('File processed successfully');
+            }
+
+            if (data.type === 'process_error') {
+                toast.error('Failed to process file');
+            }
         }
     }, []);
 
@@ -87,14 +88,15 @@ const FilesList = () => {
             <div className="container mx-auto px-4">
                 <div className="flex justify-between md:items-center flex-col md:flex-row">
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-bold">Your uploads</h1>
-                        <p className="text-sm text-neutral-400 mb-4">Select image and chose what you want to do with it</p>
+                        <h1 className="text-xl md:text-2xl font-bold">Your uploads</h1>
+                        <p className="text-xs md:text-sm text-neutral-400 mb-4">Select image and chose what you want to do with it</p>
                     </div>
                     <div className="flex gap-2">
-                        <Button onClick={handleSelectButton}>
+                        <Button onClick={handleSelectButton} size="sm">
                             {selectedFilesIds.length === files.length ? 'Deselect all' : 'Select all'}
                         </Button>
-                        <Button variant="destructive" onClick={handleDeleteAll} disabled={isDeletingAll}>
+                        <DropButton size="sm" variant="primary" text="Upload" />
+                        <Button variant="destructive" onClick={handleDeleteAll} disabled={isDeletingAll} size="sm">
                             {isDeletingAll ? 'Deleting...' : 'Delete all'}
                         </Button>
                     </div>
@@ -103,12 +105,12 @@ const FilesList = () => {
                     style={{ height: calculateFilesListHeight() }}>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-6">
                         {files && files.map((file) => (
-                            <FileItem key={file.id} file={file} selectedFilesIds={selectedFilesIds} setSelectedFilesIds={setSelectedFilesIds} fetchFiles={fetchFiles} />
+                            <FileItem key={file.id} file={file} />
                         ))}
                     </div>
                 </div>
             </div>
-            <Manager ref={managerRef} files={files} selectedFilesIds={selectedFilesIds} setFiles={setFiles} />
+            <Manager ref={managerRef} />
         </>
     )
 }

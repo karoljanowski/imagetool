@@ -16,4 +16,12 @@ export type File = {
     processedCompressed?: boolean;
     processedPath?: string;
 }
-export type FileStatus = 'UPLOADING' | 'UPLOADED' | 'PROCESSING' | 'PROCESSED';
+
+export type FileStatus = 'UPLOADING' | 'UPLOADED' | 'PROCESSING' | 'PROCESSED' | 'ERROR';
+
+export enum FormatOptionsEnum {
+    PNG = 'png',
+    JPEG = 'jpeg',
+    WEBP = 'webp',
+    AVIF = 'avif'
+}

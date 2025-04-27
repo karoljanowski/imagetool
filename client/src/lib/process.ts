@@ -7,6 +7,7 @@ const processFile = async (file: File) => {
     const formData = new FormData();
 
     formData.append("fileId", file.id);
+    formData.append("token", token);
     if (file.processedWidth) {
         formData.append("newWidth", file.processedWidth.toString());
     }
@@ -23,10 +24,6 @@ const processFile = async (file: File) => {
         formData.append("removeBackground", file.processedRemovedBackground.toString());
     }
 
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/process`, formData, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/process`, formData);
 }
 export default processFile;

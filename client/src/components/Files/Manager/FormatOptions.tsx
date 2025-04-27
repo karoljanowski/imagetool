@@ -1,29 +1,27 @@
 import { Button } from "@/components/ui/button"
 import { FileCog2Icon } from "lucide-react"
-import { useEffect, useState, Dispatch, SetStateAction } from "react"
-import { File } from "@/lib/types/file";
+import { useEffect, useState } from "react"
+import { useFiles } from "@/lib/context/FileContext";
+import { FormatOptionsEnum } from "@/lib/types/file";
 
-const FormatOptions = ({ setFiles, selectedFilesIds }: { 
-    setFiles: Dispatch<SetStateAction<File[]>>, 
-    selectedFilesIds: string[]
-}) => {
-    const [selectedFormat, setSelectedFormat] = useState<string>('png');
-    
+const FormatOptions = () => {
+    const { selectedFilesIds, setFiles } = useFiles();
+    const [selectedFormat, setSelectedFormat] = useState<FormatOptionsEnum>(FormatOptionsEnum.PNG);
     const formats = [
-        { id: 'png', label: 'PNG', description: 'Lossless, supports transparency' },
-        { id: 'jpg', label: 'JPG', description: 'Smaller file size, no transparency' },
-        { id: 'webp', label: 'WEBP', description: 'Modern format, great compression' },
-        { id: 'avif', label: 'AVIF', description: 'Next-gen format, best compression' }
+        { id: FormatOptionsEnum.PNG, label: 'PNG', description: 'Lossless, supports transparency' },
+        { id: FormatOptionsEnum.JPEG, label: 'JPEG', description: 'Smaller file size, no transparency' },
+        { id: FormatOptionsEnum.WEBP, label: 'WEBP', description: 'Modern format, great compression' },
+        { id: FormatOptionsEnum.AVIF, label: 'AVIF', description: 'Next-gen format, best compression' }
     ];
 
     useEffect(() => {
         setFiles(prevFiles => prevFiles.map(file => {
             if (selectedFilesIds.includes(file.id)) {
-                return { ...file, processedFormat: selectedFormat, processedRemovedBackground: selectedFormat === 'jpg' ? false : file.processedRemovedBackground };
+                return { ...file, processedFormat: selectedFormat, processedRemovedBackground: selectedFormat === FormatOptionsEnum.JPEG ? false : file.processedRemovedBackground };
             }
             return file;
         }));
-    }, [selectedFormat, selectedFilesIds, setFiles]);
+    }, [selectedFormat, selectedFilesIds]);
 
     return (
         <div className="flex flex-col gap-2 w-full">

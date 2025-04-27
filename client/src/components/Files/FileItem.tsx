@@ -7,17 +7,15 @@ import { Button } from "../ui/button"
 import { deleteFile } from "@/lib/delete"
 import { toast } from "sonner"
 import Link from "next/link"
+import { useFiles } from "@/lib/context/FileContext"
 interface FileItemProps {
     file: File;
-    selectedFilesIds: string[];
-    setSelectedFilesIds: (filesIds: string[]) => void;
-    fetchFiles: () => void;
 }
 
-const FileItem = ({ file, selectedFilesIds, setSelectedFilesIds, fetchFiles }: FileItemProps) => {
+const FileItem = ({ file }: FileItemProps) => {
+    const { selectedFilesIds, setSelectedFilesIds, fetchFiles } = useFiles();
     const [isHovered, setIsHovered] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-
     const handleSelect = () => {
         if (selectedFilesIds.includes(file.id)) {
             setSelectedFilesIds(selectedFilesIds.filter((id) => id !== file.id));

@@ -3,14 +3,12 @@ import { Switch } from "@/components/ui/switch";
 import { SettingsIcon } from "lucide-react";
 import { File } from "@/lib/types/file";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useFiles } from "@/lib/context/FileContext";
 
-const OtherOptions = ({ setFiles, selectedFilesIds, files }: { 
-    setFiles: Dispatch<SetStateAction<File[]>>, 
-    selectedFilesIds: string[],
-    files: File[]
-}) => {
+const OtherOptions = () => {
     const [removeBackground, setRemoveBackground] = useState(false);
     const [removeBackgroundDisabled, setRemoveBackgroundDisabled] = useState(false);
+    const { selectedFilesIds, setFiles, files } = useFiles();
 
     const handleRemoveBackground = (checked: boolean) => {
         setRemoveBackground(checked);

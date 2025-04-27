@@ -2,21 +2,9 @@
 import { UploadCloudIcon, CheckIcon } from "lucide-react"
 import { motion } from "motion/react"
 import { Button } from "../ui/button"
-import { useRouter } from "next/navigation"
-import upload from "@/lib/upload"
+import DropButton from "../DropButton"
 
 const DropImage = () => {
-    const router = useRouter();
-    
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        if (!e.target.files || e.target.files.length === 0) return;
-        const files = Array.from(e.target.files);
-        router.push("/files");
-        for (const file of files) {
-            upload(file);
-        }
-    }
     
     return (
         <motion.div
@@ -42,20 +30,7 @@ const DropImage = () => {
                             <p className="text-sm text-neutral-400 mb-6">WEBP, PNG, JPG or HEIC</p>
                             
                             <div className="flex flex-col sm:flex-row gap-4 items-center">
-                                <input 
-                                    type="file" 
-                                    name="file" 
-                                    id="file-input" 
-                                    className="hidden"
-                                    onChange={handleFileChange}
-                                    accept=".webp,.png,.jpg,.jpeg,.heic"
-                                    multiple
-                                />
-                                <Button variant="secondary" className="w-full" asChild>
-                                    <label htmlFor="file-input" className="w-full">
-                                        Choose file
-                                    </label>
-                                </Button>
+                                <DropButton size="default" variant="secondary" text="Choose file" className="w-full" />
                             </div>
                             
                             <div className="mt-8 w-full">

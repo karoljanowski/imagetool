@@ -2,15 +2,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScalingIcon } from "lucide-react";
-import { useEffect, useState, Dispatch, SetStateAction } from "react";
+import { useEffect, useState } from "react";
 import { File } from "@/lib/types/file";
+import { useFiles } from "@/lib/context/FileContext";
 
-const ResizeOptions = ({ setFiles, selectedFilesIds }: { 
-    setFiles: Dispatch<SetStateAction<File[]>>, 
-    selectedFilesIds: string[]
-}) => {
+const ResizeOptions = () => {
     const [width, setWidth] = useState<number | ''>('');
     const [height, setHeight] = useState<number | ''>('');
+    const { selectedFilesIds, setFiles } = useFiles();
 
     const handleResize = () => {
         if (!width && !height) return;
@@ -29,7 +28,7 @@ const ResizeOptions = ({ setFiles, selectedFilesIds }: {
     
     useEffect(() => {
         handleResize();
-    }, [width, height, handleResize]);
+    }, [width, height]);
 
     useEffect(() => {
         if (selectedFilesIds.length > 0) {

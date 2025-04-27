@@ -1,10 +1,13 @@
 import axios from "axios";
 import getToken from "./token";
-import { File } from "./types/file";
+import { File, FileStatus } from "./types/file";
+import { toast } from "sonner";
 
-const processFile = async (file: File) => {
+const processFile = async (file: File, setStatus: (fileId: string, status: FileStatus) => void, fetchFiles: () => void) => {
     const token = await getToken();
     const formData = new FormData();
+
+    setStatus(file.id, "PROCESSING");
 
     formData.append("fileId", file.id);
     formData.append("token", token);
@@ -24,6 +27,12 @@ const processFile = async (file: File) => {
         formData.append("removeBackground", file.processedRemovedBackground.toString());
     }
 
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/process`, formData);
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/process`, formData)
+    .then(() => {
+        fetchFiles();
+    })
+    .catch(() => {
+        toast.error("Failed to process file");
+    });
 }
 export default processFile;

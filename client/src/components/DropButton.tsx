@@ -1,6 +1,7 @@
 import upload from "@/lib/upload";
 import { Button } from "./ui/button"
 import { useRouter } from "next/navigation"
+import { useFiles } from "@/lib/context/FileContext";
 
 interface DropButtonProps {
     size?: "sm" | "default";
@@ -11,6 +12,7 @@ interface DropButtonProps {
 
 const DropButton = ({ size = "default", variant = "primary", text, className }: DropButtonProps) => {
     const router = useRouter();
+    const { addFile, fetchFiles } = useFiles();
     
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -18,7 +20,7 @@ const DropButton = ({ size = "default", variant = "primary", text, className }: 
         const files = Array.from(e.target.files);
         router.push("/files");
         for (const file of files) {
-            upload(file);
+            upload(file, addFile, fetchFiles);
         }
     }
 

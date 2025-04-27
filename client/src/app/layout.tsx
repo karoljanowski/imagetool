@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Background from "@/components/Background";
 import { Toaster } from "@/components/ui/sonner"
+import { FileProvider } from "@/lib/context/FileContext";
+import Drop from "@/components/Drop";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
@@ -29,7 +31,10 @@ export default function RootLayout({
         className={`${poppins.variable} antialiased relative`}
       >
         <Background />
-        {children}
+        <FileProvider>
+          <Drop />
+          {children}
+        </FileProvider>
         <Toaster position="top-center" />
       </body>
     </html>

@@ -1,11 +1,13 @@
 import axios from "axios";
 import getToken from "./token";
 import { toast } from "sonner"; 
+import { v4 as uuidv4 } from "uuid";
+import { File as FileType, FileStatus } from "./types/file";
 
-const upload = async (file: File) => {
+const upload = async (fileObj: globalThis.File, addFileToContext: (file: FileType) => void, fetchFiles?: () => void) => {
     try {
-        const token = await getToken();
-        const format = file.type.split("/")[1];
+        const token = getToken();
+        const format = fileObj.type.split("/")[1];
 
         toast.info("Upload started");
 
@@ -13,24 +15,33 @@ const upload = async (file: File) => {
             throw new Error("Invalid file format");
         }
 
-        // step 1: init upload
-        const initFormData = new FormData();
-        initFormData.append('token', token);
-        initFormData.append("fileName", file.name.split(".")[0]);
-        initFormData.append("format", format);
-
-        const initUploadResponse = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/init-upload`, initFormData)
-        .catch(() => {
-            throw new Error("Failed to initialize upload");
-        });
-
+        if (addFileToContext) {
+            const newFile: FileType = {
+                id: uuidv4(),
+                token,
+                name: fileObj.name.split(".")[0],
+                url: URL.createObjectURL(fileObj),
+                status: 'UPLOADING',
+                size: fileObj.size,
+                originalFormat: format
+            };
+            
+            addFileToContext(newFile);
+        }
 
         const uploadFormData = new FormData();
-        uploadFormData.append('fileId', initUploadResponse.data.fileId);
-        uploadFormData.append("file", file);
+        uploadFormData.append('token', token);
+        uploadFormData.append("fileName", fileObj.name.split(".")[0]);
+        uploadFormData.append("format", format);
+        uploadFormData.append("file", fileObj);
 
-        // step 2: upload file
         await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/upload`, uploadFormData)
+        .then(() => {
+            if (fetchFiles) {
+                fetchFiles();
+            }
+            toast.success("File uploaded successfully");
+        })
         .catch(() => {
             throw new Error("Failed to upload file");
         });

@@ -35,9 +35,7 @@ model File {
 }
 
 enum FileStatus {
-  UPLOADING
   UPLOADED
-  PROCESSING
   PROCESSED
   ERROR
 }

@@ -5,7 +5,6 @@ import FileItem from "./FileItem";
 import { Button } from "../ui/button";
 import { deleteAllFiles } from "@/lib/delete";
 import { toast } from "sonner";
-import getToken from "@/lib/token";
 import { useFiles } from "@/lib/context/FileContext";
 import DropButton from "../DropButton";
 
@@ -44,41 +43,6 @@ const FilesList = () => {
 
     useEffect(() => {
         fetchFiles();
-
-        const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`);
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            const token = getToken();
-            if (data.token !== token) return;
-
-            if (data.type === 'upload_complete' || 
-                data.type === 'upload_init' || 
-                data.type === 'upload_error' ||
-                data.type === 'process_complete' ||
-                data.type === 'process_error' ||
-                data.type === 'process_started') {
-                fetchFiles();
-            }
-            if (data.type === 'upload_error') {
-                toast.error('Failed to upload file');
-            }
-
-            if (data.type === 'upload_complete') {
-                toast.success('File uploaded successfully');
-            }
-
-            if (data.type === 'process_started') {
-                toast.info('Processing started');
-            }
-
-            if (data.type === 'process_complete') {
-                toast.success('File processed successfully');
-            }
-
-            if (data.type === 'process_error') {
-                toast.error('Failed to process file');
-            }
-        }
     }, []);
 
     return (

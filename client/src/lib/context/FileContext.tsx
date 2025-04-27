@@ -1,6 +1,6 @@
 'use client'
 import { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
-import { File } from "../types/file";
+import { File, FileStatus } from "../types/file";
 import { toast } from "sonner";
 import getFiles from "../files";
 
@@ -10,6 +10,8 @@ interface FileContextType {
     selectedFilesIds: string[];
     setSelectedFilesIds: Dispatch<SetStateAction<string[]>>;
     fetchFiles: () => void;
+    addFile: (file: File) => void;
+    setStatus: (fileId: string, status: FileStatus) => void;
 }
 
 const FileContext = createContext<FileContextType | undefined>(undefined);
@@ -35,9 +37,26 @@ export const FileProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
     
+    const addFile = (file: File) => {
+        setFiles(prevFiles => [file, ...prevFiles]);
+    }
+
+    const setStatus = (fileId: string, status: FileStatus) => {
+        setFiles(prevFiles => prevFiles.map(file => file.id === fileId ? { ...file, status } : file));
+    }
     
     return (
-        <FileContext.Provider value={{ files, setFiles, selectedFilesIds, setSelectedFilesIds, fetchFiles }}>{children}</FileContext.Provider>
+        <FileContext.Provider value={{ 
+            files, 
+            setFiles, 
+            selectedFilesIds, 
+            setSelectedFilesIds, 
+            fetchFiles,
+            addFile,
+            setStatus
+        }}>
+            {children}
+        </FileContext.Provider>
     );
 };
 

@@ -4,26 +4,19 @@ import db from "../db";
 import fs from "fs";
 import sharp from "sharp";
 import path from "path";
-import { sendMessageToAllClients } from "../lib/wss";
 
 const processController = async (req: Request, res: Response) => {
     try {
         const { token, fileId, newFormat, removeBackground, compress, newWidth, newHeight } = req.body;
 
-        const file = await db.file.update({
+        const file = await db.file.findUnique({
             where: {
                 id: fileId,
                 token
-            },
-            data: {
-                status: 'PROCESSING'
             }
         })        
         
-        sendMessageToAllClients('process_started', token);
-
         if (!file) {
-            sendMessageToAllClients('process_error');
             res.status(404).json({
                 message: "File not found"
             })
@@ -31,7 +24,6 @@ const processController = async (req: Request, res: Response) => {
         }
 
         if (!file.originalPath) {
-            sendMessageToAllClients('process_error');
             res.status(404).json({
                 message: "File not found"
             })
@@ -41,7 +33,6 @@ const processController = async (req: Request, res: Response) => {
         const outputBuffer = await processFile(res, file, file.originalPath, newFormat, removeBackground, compress, newWidth, newHeight);
 
         if (!outputBuffer) {
-            sendMessageToAllClients('process_error');
             res.status(400).json({
                 message: "Invalid output buffer"
             })
@@ -53,8 +44,6 @@ const processController = async (req: Request, res: Response) => {
         res.status(200).json({
             message: "File processed successfully"
         })
-
-        sendMessageToAllClients('process_complete', token);
 
     } catch (error) {
         console.error(error);

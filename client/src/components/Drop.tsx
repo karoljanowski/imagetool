@@ -5,10 +5,12 @@ import upload from "../lib/upload";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { UploadCloudIcon } from "lucide-react";
+import { useFiles } from "../lib/context/FileContext";
 
 const Drop = () => {
     const [isDragging, setIsDragging] = useState(false);
     const router = useRouter();
+    const { addFile, fetchFiles } = useFiles();
 
     const handleDrop = async (e: DragEvent) => {
         e.preventDefault();
@@ -16,7 +18,7 @@ const Drop = () => {
         const files = Array.from(e.dataTransfer.files);
         router.push("/files");
         for (const file of files) {
-            upload(file);
+            upload(file, addFile, fetchFiles);
         }
         setIsDragging(false);
     }

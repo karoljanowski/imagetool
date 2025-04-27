@@ -4,12 +4,12 @@ import processFile from "@/lib/process";
 import { useFiles } from "@/lib/context/FileContext";
 
 const ActionButtons = () => {
-    const { files, selectedFilesIds } = useFiles();
+    const { files, selectedFilesIds, setStatus, fetchFiles } = useFiles();
 
     const handleProcess = () => {
         files.forEach(async (file) => {
             if (selectedFilesIds.includes(file.id)) {
-                processFile(file);
+                processFile(file, setStatus, fetchFiles);
             }
         });
     }

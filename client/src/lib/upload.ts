@@ -2,7 +2,7 @@ import axios from "axios";
 import getToken from "./token";
 import { toast } from "sonner"; 
 import { v4 as uuidv4 } from "uuid";
-import { File as FileType, FileStatus } from "./types/file";
+import { File as FileType } from "./types/file";
 
 const upload = async (fileObj: globalThis.File, addFileToContext: (file: FileType) => void, fetchFiles?: () => void) => {
     try {

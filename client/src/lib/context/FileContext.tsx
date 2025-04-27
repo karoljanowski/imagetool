@@ -1,5 +1,5 @@
 'use client'
-import { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useContext, useState, useEffect } from "react";
 import { File, FileStatus } from "../types/file";
 import { toast } from "sonner";
 import getFiles from "../files";
@@ -44,6 +44,10 @@ export const FileProvider = ({ children }: { children: React.ReactNode }) => {
     const setStatus = (fileId: string, status: FileStatus) => {
         setFiles(prevFiles => prevFiles.map(file => file.id === fileId ? { ...file, status } : file));
     }
+
+    useEffect(() => {
+        fetchFiles();
+    }, []);
     
     return (
         <FileContext.Provider value={{ 

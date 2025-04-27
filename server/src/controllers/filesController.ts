@@ -17,6 +17,9 @@ const getFilesController = async (req: Request, res: Response) => {
         const files = await db.file.findMany({
             where: {
                 token
+            },
+            orderBy: {
+                createdAt: "desc"
             }
         });
 

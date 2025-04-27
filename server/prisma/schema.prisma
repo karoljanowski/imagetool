@@ -16,6 +16,7 @@ datasource db {
 
 model File {
   id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
   token     String
   name      String
   status    FileStatus

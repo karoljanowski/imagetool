@@ -10,9 +10,6 @@ const processController = async (req: Request, res: Response) => {
     try {
         const { token, fileId, newFormat, removeBackground, compress, newWidth, newHeight } = req.body;
 
-        sendMessageToAllClients('process_started', token);
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
         const file = await db.file.update({
             where: {
                 id: fileId,
@@ -21,8 +18,10 @@ const processController = async (req: Request, res: Response) => {
             data: {
                 status: 'PROCESSING'
             }
-        })
+        })        
         
+        sendMessageToAllClients('process_started', token);
+
         if (!file) {
             sendMessageToAllClients('process_error');
             res.status(404).json({

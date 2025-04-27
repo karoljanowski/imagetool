@@ -56,7 +56,6 @@ const initUploadController = async (req: Request, res: Response) => {
 
 const uploadController = async (req: Request, res: Response) => {
     try {
-        await new Promise(resolve => setTimeout(resolve, 2000));
         const fileBuffer = req.file;
         const fileId = req.body.fileId;
 

@@ -1,7 +1,6 @@
 'use client'
 import { UploadCloudIcon, CheckIcon } from "lucide-react"
 import { motion } from "motion/react"
-import { Button } from "../ui/button"
 import DropButton from "../DropButton"
 
 const DropImage = () => {

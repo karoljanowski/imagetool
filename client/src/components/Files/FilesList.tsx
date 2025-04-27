@@ -1,8 +1,6 @@
 'use client'
-import getFiles from "@/lib/files";
 import { useEffect, useState, useRef } from "react";
 import Manager from "./Manager/Manager";
-import { File } from "@/lib/types/file";
 import FileItem from "./FileItem";
 import { Button } from "../ui/button";
 import { deleteAllFiles } from "@/lib/delete";

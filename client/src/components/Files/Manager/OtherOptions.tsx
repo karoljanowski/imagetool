@@ -1,8 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SettingsIcon } from "lucide-react";
-import { File } from "@/lib/types/file";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFiles } from "@/lib/context/FileContext";
 
 const OtherOptions = () => {

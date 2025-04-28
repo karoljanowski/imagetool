@@ -4,7 +4,6 @@ import Manager from "./Manager/Manager";
 import FileItem from "./FileItem";
 import { Button } from "../ui/button";
 import { deleteAllFiles } from "@/lib/delete";
-import { toast } from "sonner";
 import { useFiles } from "@/lib/context/FileContext";
 import DropButton from "../DropButton";
 import { Skeleton } from "../ui/skeleton";

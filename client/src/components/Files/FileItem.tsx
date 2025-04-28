@@ -5,7 +5,6 @@ import { useState } from "react"
 import { formatFileSize } from "@/lib/utils"
 import { Button } from "../ui/button"
 import { deleteFile } from "@/lib/delete"
-import { toast } from "sonner"
 import { useFiles } from "@/lib/context/FileContext"
 import getToken from "@/lib/token"
 import { donwloadSingleFile } from "@/lib/download"
@@ -34,13 +33,7 @@ const FileItem = ({ file }: FileItemProps) => {
     const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
         setIsDeleting(true);
-        const data = await deleteFile(file.id);
-        if (data.success) {
-            fetchFiles();
-            toast.success(data.message);
-        } else {
-            toast.error(data.message);
-        }
+        await deleteFile(file.id, fetchFiles);
         setIsDeleting(false);
     }
 

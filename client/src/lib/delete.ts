@@ -19,20 +19,15 @@ const deleteAllFiles = async (fetchFiles: () => void) => {
     }
 }
 
-const deleteFile = async (fileId: string) => {
+const deleteFile = async (fileId: string, fetchFiles: () => void) => {
     try {
         const token = await getToken();
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/delete/${token}/${fileId}`);
-        return {
-            success: response.data.success,
-            message: response.data.message
-        };
+        fetchFiles();
+        toast.success(response.data.message);
     } catch (error) {
         const axiosError = error as AxiosError<ApiResponse>;
-        return {
-            success: false,
-            message: axiosError.response?.data?.message || "Failed to delete file"
-        };
+        toast.error(axiosError.response?.data?.message || "Failed to delete file");
     }
 }
 

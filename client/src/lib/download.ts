@@ -1,10 +1,5 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { toast } from "sonner";
-
-interface ApiResponse {
-    success: boolean;
-    message: string;
-}
 
 const donwloadSingleFile = async (token: string, fileId: string, processedFormat: string, name: string) => {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/processedFile/${token}/${fileId}.${processedFormat}`, {

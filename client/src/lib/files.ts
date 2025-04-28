@@ -1,10 +1,11 @@
 import axios, { AxiosError } from "axios";
 import getToken from "./token";
+import { File } from "./types/file";
 
 interface ApiResponse {
     success: boolean;
     message?: string;
-    filesList?: any[];
+    filesList?: File[];
 }
 
 const getFiles = async () => {

@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { downloadController } from "../controllers/downloadController";
+import { downloadAllController } from "../controllers/downloadController";
 
 const router = Router();
 
-router.get("/download/:token/:fileId", downloadController);
+router.get("/downloadAll/:token", downloadAllController);
 
 export default router;

@@ -10,6 +10,7 @@ export type File = {
     originalFormat?: string;
     originalPath?: string;
     processedFormat?: string;
+    processedSize?: number;
     processedWidth?: number;
     processedHeight?: number;
     processedRemovedBackground?: boolean;

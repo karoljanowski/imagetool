@@ -12,6 +12,8 @@ interface FileContextType {
     fetchFiles: () => void;
     addFile: (file: File) => void;
     setStatus: (fileId: string, status: FileStatus) => void;
+    isLoading: boolean;
+    isFirstLoad: boolean;
 }
 
 const FileContext = createContext<FileContextType | undefined>(undefined);
@@ -19,8 +21,11 @@ const FileContext = createContext<FileContextType | undefined>(undefined);
 export const FileProvider = ({ children }: { children: React.ReactNode }) => {
     const [files, setFiles] = useState<File[]>([]);
     const [selectedFilesIds, setSelectedFilesIds] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     const fetchFiles = async () => {
+        setIsLoading(true);
         const data = await getFiles();
         if (data.success) {
             setFiles(data.filesList.map((file: File) => ({
@@ -35,6 +40,8 @@ export const FileProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
             toast.error(data.message);
         }
+        setIsLoading(false);
+        setIsFirstLoad(false);
     }
     
     const addFile = (file: File) => {
@@ -57,7 +64,9 @@ export const FileProvider = ({ children }: { children: React.ReactNode }) => {
             setSelectedFilesIds, 
             fetchFiles,
             addFile,
-            setStatus
+            setStatus,
+            isLoading,
+            isFirstLoad
         }}>
             {children}
         </FileContext.Provider>

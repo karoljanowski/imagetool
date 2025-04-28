@@ -7,9 +7,10 @@ import { deleteAllFiles } from "@/lib/delete";
 import { toast } from "sonner";
 import { useFiles } from "@/lib/context/FileContext";
 import DropButton from "../DropButton";
+import { Skeleton } from "../ui/skeleton";
 
 const FilesList = () => {
-    const { files, selectedFilesIds, setSelectedFilesIds, fetchFiles } = useFiles();
+    const { files, selectedFilesIds, setSelectedFilesIds, fetchFiles, isLoading, isFirstLoad } = useFiles();
     const [isDeletingAll, setIsDeletingAll] = useState(false);
     const managerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
@@ -50,22 +51,28 @@ const FilesList = () => {
                         <p className="text-xs md:text-sm text-neutral-400 mb-4">Select image and chose what you want to do with it</p>
                     </div>
                     <div className="flex gap-2">
-                        <Button onClick={handleSelectButton} size="sm">
+                        <Button onClick={handleSelectButton} size="sm" disabled={isLoading || files.length === 0}>
                             {selectedFilesIds.length === files.length ? 'Deselect all' : 'Select all'}
                         </Button>
                         <DropButton size="sm" variant="primary" text="Upload" />
-                        <Button variant="destructive" onClick={handleDeleteAll} disabled={isDeletingAll} size="sm">
+                        <Button variant="destructive" onClick={handleDeleteAll} disabled={isDeletingAll || isLoading || files.length === 0} size="sm">
                             {isDeletingAll ? 'Deleting...' : 'Delete all'}
                         </Button>
                     </div>
                 </div>
                 <div ref={listRef} className="overflow-y-auto relative mask-scroll-container" 
                     style={{ height: calculateFilesListHeight() }}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-6">
-                        {files && files.map((file) => (
-                            <FileItem key={file.id} file={file} />
-                        ))}
-                    </div>
+                    {isFirstLoad ? (
+                        <FilesListSkeleton />
+                    ) : files.length === 0 ? (
+                        <EmptyFilesList />
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-6">
+                            {files.map((file) => (
+                                <FileItem key={file.id} file={file} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
             <Manager ref={managerRef} />
@@ -73,6 +80,23 @@ const FilesList = () => {
     )
 }
 
+const FilesListSkeleton = () => {
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-6">
+            {Array.from({ length: 6 }).map((_, index) => (
+                <Skeleton key={index} className="w-full h-56" />
+            ))}
+        </div>
+    )
+}
 
+const EmptyFilesList = () => {
+    return (
+        <div className="flex flex-col items-center justify-center h-full text-center py-12">
+            <p className="text-lg text-neutral-200 mb-2">No files uploaded yet</p>
+            <p className="text-sm text-neutral-300">Drop your files here or click the upload button</p>
+        </div>
+    )
+}
 
 export default FilesList;

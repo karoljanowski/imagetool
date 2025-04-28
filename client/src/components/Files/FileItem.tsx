@@ -6,8 +6,11 @@ import { formatFileSize } from "@/lib/utils"
 import { Button } from "../ui/button"
 import { deleteFile } from "@/lib/delete"
 import { toast } from "sonner"
-import Link from "next/link"
 import { useFiles } from "@/lib/context/FileContext"
+import getToken from "@/lib/token"
+import Link from "next/link"
+import { donwloadSingleFile } from "@/lib/download"
+
 interface FileItemProps {
     file: File;
 }
@@ -16,7 +19,12 @@ const FileItem = ({ file }: FileItemProps) => {
     const { selectedFilesIds, setSelectedFilesIds, fetchFiles } = useFiles();
     const [isHovered, setIsHovered] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
     const handleSelect = () => {
+        if (file.status === 'UPLOADING' || file.status === 'PROCESSING') {
+            return;
+        }
+
         if (selectedFilesIds.includes(file.id)) {
             setSelectedFilesIds(selectedFilesIds.filter((id) => id !== file.id));
         } else {
@@ -53,8 +61,14 @@ const FileItem = ({ file }: FileItemProps) => {
                         </div>
                         
                         {file.size && (
-                            <div className="text-xs text-neutral-300">
-                                {formatFileSize(file.size)}
+                            <div className="text-xs text-neutral-300 flex items-center gap-1">
+                                {formatFileSize(file.size)} 
+                                {file.processedSize && (
+                                    <>
+                                        <ArrowRightIcon className="w-3 h-3 text-neutral-300" />
+                                        {formatFileSize(file.processedSize)}
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>
@@ -85,8 +99,8 @@ const FileItem = ({ file }: FileItemProps) => {
             <div className="flex justify-start gap-1 items-center w-full border-t border-neutral-600/50 pt-2">
                 <StatusBadge status={file.status} />
 
-                {file.status === 'PROCESSED' && (
-                    <DownloadButton file={file} />
+                {file.status === 'PROCESSED' && file.processedFormat && (
+                    <DownloadButton fileId={file.id} processedFormat={file.processedFormat} name={file.name} />
                 )}
 
                 {isHovered && file.status !== 'UPLOADING' && (
@@ -163,13 +177,13 @@ const StatusBadge = ({ status }: { status: FileStatus }) => {
     )
 }
 
-const DownloadButton = ({ file }: { file: File }) => {
+const DownloadButton = ({ fileId, processedFormat, name }: { fileId: string, processedFormat: string, name: string }) => {
+    const token = getToken();
+
     return (
-        <Button className="text-xs py-1 px-2 bg-blue-500/75 hover:bg-blue-500 rounded-full" asChild>
-            <Link href={`${process.env.NEXT_PUBLIC_API_URL}/download/${file.token}/${file.id}`}>
+        <Button className="text-xs py-1 px-2 bg-blue-500/75 hover:bg-blue-500 rounded-full" onClick={() => donwloadSingleFile(token, fileId, processedFormat, name)}>
                 <DownloadIcon className="w-2 h-2" />
                 Download
-            </Link>
         </Button>
     )
 }

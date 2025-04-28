@@ -39,7 +39,8 @@ const getFilesController = async (req: Request, res: Response) => {
                 processedHeight: file.processedHeight,
                 processedRemovedBackground: file.processedRemovedBackground,
                 processedCompressed: file.processedCompressed,
-                processedPath: file.processedPath
+                processedPath: file.processedPath,
+                processedSize: file.processedSize
             }
         });
 
@@ -53,12 +54,25 @@ const getFilesController = async (req: Request, res: Response) => {
 }
 
 const getFileController = async (req: Request, res: Response) => {
+    getFile({ req, res, dir: 'uploads' });
+}
+const getProcessedFileController = async (req: Request, res: Response) => {
+    getFile({ req, res, dir: 'processed' });
+}
+
+interface GetFileParams {
+    req: Request;
+    res: Response;
+    dir: 'uploads' | 'processed';
+}
+
+const getFile = async ({ req, res, dir }: GetFileParams) => {
     try {
         const token = req.params.token;
-        const name = req.params.name;
+        const fileId = req.params.fileId;
 
         const __dirname = path.resolve();
-        const uploadDir = path.join(__dirname, "uploads", token, name);
+        const uploadDir = path.join(__dirname, dir, token, fileId);
 
         if (!fs.existsSync(uploadDir)) {
             res.status(404).json({
@@ -76,4 +90,4 @@ const getFileController = async (req: Request, res: Response) => {
     }
 }
 
-export { getFilesController, getFileController };
+export { getFilesController, getFileController, getProcessedFileController };

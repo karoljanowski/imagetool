@@ -72,11 +72,6 @@ const processFile = async (res: Response, file: FileType, originalPath: string, 
         }
     }
 
-    // background removal
-    if (removeBackground && file.originalFormat !== 'jpeg') {
-        sharpInstance = sharpInstance.removeAlpha().ensureAlpha(0);
-    }
-
     // resize
     if (newWidth && newHeight) {
         const width = parseInt(newWidth);
@@ -107,6 +102,11 @@ const processFile = async (res: Response, file: FileType, originalPath: string, 
             })
             return;
         }
+    }
+
+    // background removal
+    if (removeBackground && file.processedFormat !== 'jpeg') {
+        sharpInstance = sharpInstance.removeAlpha().ensureAlpha(0);
     }
 
     return sharpInstance.toBuffer();

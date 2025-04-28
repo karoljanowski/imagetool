@@ -24,9 +24,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preload" href="/bg.png" as="image" />
-      </head>
       <body
         className={`${poppins.variable} antialiased relative`}
       >

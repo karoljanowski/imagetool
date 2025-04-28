@@ -1,8 +1,13 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import getToken from "./token";
 import { toast } from "sonner"; 
 import { v4 as uuidv4 } from "uuid";
 import { File as FileType } from "./types/file";
+
+interface ApiResponse {
+    success: boolean;
+    message: string;
+}
 
 const upload = async (fileObj: globalThis.File, addFileToContext: (file: FileType) => void, fetchFiles?: () => void) => {
     try {
@@ -42,14 +47,11 @@ const upload = async (fileObj: globalThis.File, addFileToContext: (file: FileTyp
             }
             toast.success("File uploaded successfully");
         })
-        .catch(() => {
-            throw new Error("Failed to upload file");
-        });
     } catch (error) {
-        if (error instanceof Error) {
-            toast.error(error.message);
-        } else {
-            toast.error("Failed to upload file");
+        const axiosError = error as AxiosError<ApiResponse>;
+        toast.error(axiosError.response?.data?.message || "Failed to upload file");
+        if (fetchFiles) {
+            fetchFiles();
         }
     }
 }

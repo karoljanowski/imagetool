@@ -1,25 +1,21 @@
 import axios, { AxiosError } from "axios";
 import getToken from "./token";
+import { toast } from "sonner";
 
 interface ApiResponse {
     success: boolean;
     message: string;
 }
 
-const deleteAllFiles = async () => {
+const deleteAllFiles = async (fetchFiles: () => void) => {
     try {
         const token = await getToken();
         const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/deleteAll/${token}`);
-        return {
-            success: response.data.success,
-            message: response.data.message
-        };
+        fetchFiles();
+        toast.success(response.data.message);
     } catch (error) {
         const axiosError = error as AxiosError<ApiResponse>;
-        return {
-            success: false,
-            message: axiosError.response?.data?.message || "Failed to delete files"
-        };
+        toast.error(axiosError.response?.data?.message || "Failed to delete files");
     }
 }
 

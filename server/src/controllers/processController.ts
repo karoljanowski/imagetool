@@ -21,6 +21,7 @@ const processController = async (req: Request, res: Response) => {
         
         if (!file) {
             res.status(404).json({
+                success: false,
                 message: "File not found"
             })
             return;
@@ -28,6 +29,7 @@ const processController = async (req: Request, res: Response) => {
 
         if (!file.originalPath) {
             res.status(404).json({
+                success: false,
                 message: "File not found"
             })
             return;
@@ -37,6 +39,7 @@ const processController = async (req: Request, res: Response) => {
 
         if (!outputBuffer) {
             res.status(400).json({
+                success: false,
                 message: "Invalid output buffer"
             })
             return;
@@ -45,12 +48,14 @@ const processController = async (req: Request, res: Response) => {
         await saveFile(file, outputBuffer, newFormat, newWidth, newHeight, removeBackground, compress);
 
         res.status(200).json({
+            success: true,
             message: "File processed successfully"
         })
 
     } catch (error) {
         console.error(error);
         res.status(500).json({
+            success: false,
             message: "Internal server error"
         });
     }

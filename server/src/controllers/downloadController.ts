@@ -11,6 +11,7 @@ const downloadAllController = async (req: Request, res: Response) => {
     try {
         if (!token) {
             res.status(400).json({
+                success: false,
                 message: "Invalid token"
             });
             return;
@@ -24,6 +25,7 @@ const downloadAllController = async (req: Request, res: Response) => {
 
         if (files.length === 0) {
             res.status(404).json({
+                success: false,
                 message: "No files found"
             });
             return;
@@ -34,6 +36,7 @@ const downloadAllController = async (req: Request, res: Response) => {
 
         if (!fs.existsSync(processedDir)) {
             res.status(404).json({
+                success: false,
                 message: "No processed images found"
             });
             return;
@@ -54,6 +57,7 @@ const downloadAllController = async (req: Request, res: Response) => {
         
         if (filesAdded === 0) {
             res.status(404).json({
+                success: false,
                 message: "No processed files available for download"
             });
             return;
@@ -86,6 +90,7 @@ const downloadAllController = async (req: Request, res: Response) => {
         }
         
         res.status(500).json({
+            success: false,
             message: "An error occurred while preparing the download"
         });
     }

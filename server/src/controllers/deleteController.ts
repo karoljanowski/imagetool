@@ -7,6 +7,14 @@ const deleteAllFilesController = async (req: Request, res: Response) => {
         const token = req.params.token;
         const path = `./uploads/${token}`;
 
+        if (!fs.existsSync(path)) {
+            res.status(404).json({
+                success: false,
+                message: "Files not found"
+            });
+            return;
+        }
+
         fs.rmSync(path, { recursive: true, force: true });
         await db.file.deleteMany({
             where: {

@@ -17,6 +17,7 @@ const uploadController = async (req: Request, res: Response) => {
 
         if (!fileBuffer) {
             res.status(400).json({
+                success: false,
                 message: "No file provided"
             });
             return;
@@ -24,6 +25,7 @@ const uploadController = async (req: Request, res: Response) => {
         
         if (!token || !fileName || !format) {
             res.status(400).json({
+                success: false,
                 message: "Some required fields are missing"
             });
             return;
@@ -31,6 +33,7 @@ const uploadController = async (req: Request, res: Response) => {
 
         if (!['jpeg', 'png', 'webp', 'avif'].includes(format)) {
             res.status(400).json({
+                success: false,
                 message: "Invalid format"
             });
             return;
@@ -72,6 +75,7 @@ const uploadController = async (req: Request, res: Response) => {
         console.error('Error in uploadController:', error);
 
         res.status(500).json({
+            success: false,
             message: "Internal server error"
         });
     }

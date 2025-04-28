@@ -32,13 +32,7 @@ const FilesList = () => {
 
     const handleDeleteAll = async () => {
         setIsDeletingAll(true);
-        const data = await deleteAllFiles();
-        if (data.success) {
-            toast.success(data.message);
-            fetchFiles();
-        } else {
-            toast.error(data.message);
-        }
+        await deleteAllFiles(fetchFiles);
         setIsDeletingAll(false);
     }
 

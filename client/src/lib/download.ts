@@ -1,5 +1,10 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
+
+interface ApiResponse {
+    success: boolean;
+    message: string;
+}
 
 const donwloadSingleFile = async (token: string, fileId: string, processedFormat: string, name: string) => {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/processedFile/${token}/${fileId}.${processedFormat}`, {
@@ -24,15 +29,9 @@ const donwloadSingleFile = async (token: string, fileId: string, processedFormat
 
 const downloadAllFiles = async (token: string) => {
     try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/downloadAll/${token}`, {
             responseType: 'blob'
         })
-        .catch((error) => {
-            toast.error(error.message);
-            return;
-        });
-    
         if (!response) return;
     
         const blob = response.data;
@@ -44,7 +43,6 @@ const downloadAllFiles = async (token: string) => {
         a.click();
         URL.revokeObjectURL(url);
     } catch (error) {
-        console.error(error);
         toast.error("Error downloading files");
     }
 }

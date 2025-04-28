@@ -9,6 +9,7 @@ const getFilesController = async (req: Request, res: Response) => {
 
         if (!token) {
             res.status(400).json({
+                success: false,
                 message: "No token"
             });
             return;
@@ -44,10 +45,14 @@ const getFilesController = async (req: Request, res: Response) => {
             }
         });
 
-        res.status(200).json({filesList});
+        res.status(200).json({
+            success: true,
+            filesList
+        });
     } catch (error) {
         console.error('Error in getFilesController:', error);
         res.status(500).json({
+            success: false,
             message: "Internal server error"
         });
     }
@@ -76,6 +81,7 @@ const getFile = async ({ req, res, dir }: GetFileParams) => {
 
         if (!fs.existsSync(uploadDir)) {
             res.status(404).json({
+                success: false,
                 message: "File not found"
             });
             return;
@@ -85,6 +91,7 @@ const getFile = async ({ req, res, dir }: GetFileParams) => {
     } catch (error) {
         console.error("Error in getFileController:", error);
         res.status(500).json({
+            success: false,
             message: "Internal server error"
         });
     }

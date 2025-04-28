@@ -1,5 +1,11 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import getToken from "./token";
+
+interface ApiResponse {
+    success: boolean;
+    message?: string;
+    filesList?: any[];
+}
 
 const getFiles = async () => {
     try {
@@ -11,9 +17,10 @@ const getFiles = async () => {
         }
     } catch (error) {
         console.error(error);
+        const axiosError = error as AxiosError<ApiResponse>;
         return {
             success: false,
-            message: "Failed to get files"
+            message: axiosError.response?.data?.message || "Failed to get files"
         }
     }
 }

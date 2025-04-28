@@ -8,7 +8,6 @@ import { deleteFile } from "@/lib/delete"
 import { toast } from "sonner"
 import { useFiles } from "@/lib/context/FileContext"
 import getToken from "@/lib/token"
-import Link from "next/link"
 import { donwloadSingleFile } from "@/lib/download"
 
 interface FileItemProps {

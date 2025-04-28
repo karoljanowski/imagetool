@@ -37,7 +37,7 @@ const downloadAllFiles = async (token: string) => {
         a.download = `images.zip`;
         a.click();
         URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch {
         toast.error("Error downloading files");
     }
 }

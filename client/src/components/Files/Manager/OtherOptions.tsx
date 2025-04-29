@@ -1,14 +1,14 @@
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SettingsIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFiles } from "@/lib/context/FileContext";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const OtherOptions = () => {
     const [removeBackground, setRemoveBackground] = useState(false);
-    const [removeBackgroundDisabled, setRemoveBackgroundDisabled] = useState(false);
-    const { selectedFilesIds, setFiles, files } = useFiles();
+    // const [removeBackgroundDisabled, setRemoveBackgroundDisabled] = useState(false);
+    const { selectedFilesIds, setFiles } = useFiles();
 
     const handleRemoveBackground = (checked: boolean) => {
         setRemoveBackground(checked);
@@ -29,12 +29,12 @@ const OtherOptions = () => {
         }));
     }
 
-    useEffect(() => {
-        const selectedFiles = files.filter(file => selectedFilesIds.includes(file.id));
-        const hasJpg = selectedFiles.some(file => file.processedFormat === "jpg");
-        setRemoveBackgroundDisabled(hasJpg);
-        setRemoveBackground(prev => prev && !hasJpg);
-    }, [selectedFilesIds, files]);
+    // useEffect(() => {
+    //     const selectedFiles = files.filter(file => selectedFilesIds.includes(file.id));
+    //     const hasJpg = selectedFiles.some(file => file.processedFormat === "jpg");
+    //     setRemoveBackgroundDisabled(hasJpg);
+    //     setRemoveBackground(prev => prev && !hasJpg);
+    // }, [selectedFilesIds, files]);
     
     return (
         <div className="flex flex-col gap-2 w-full">

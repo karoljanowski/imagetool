@@ -11,7 +11,22 @@ const ResizeOptions = () => {
     const [height, setHeight] = useState<number | ''>('');
     const { selectedFilesIds, setFiles } = useFiles();
 
-    const handleResize = () => {
+    const handleResizeByPercentage = (percentage: number) => {
+        if (!percentage) return;
+
+        setFiles((prevFiles: File[]) => prevFiles.map(file => {
+            if (selectedFilesIds.includes(file.id)) {
+                return {
+                    ...file,
+                    processedWidth: file.originalWidth ? file.originalWidth * (percentage / 100) : file.originalWidth,
+                    processedHeight: file.originalHeight ? file.originalHeight * (percentage / 100) : file.originalHeight
+                };
+            }
+            return file;
+        }));
+    }
+
+    const handleResizeByPixels = () => {
         if (!width && !height) return;
         
         setFiles((prevFiles: File[]) => prevFiles.map(file => {
@@ -27,7 +42,7 @@ const ResizeOptions = () => {
     }
     
     useEffect(() => {
-        handleResize();
+        handleResizeByPixels();
     }, [width, height]);
 
     useEffect(() => {
@@ -81,18 +96,21 @@ const ResizeOptions = () => {
                             <Button 
                                 size="sm" 
                                 className="flex-1" 
+                                onClick={() => handleResizeByPercentage(25)}
                             >
                                 25%
                             </Button>
                             <Button 
                                 size="sm" 
                                 className="flex-1" 
+                                onClick={() => handleResizeByPercentage(50)}
                             >
                                 50%
                             </Button>
                             <Button 
                                 size="sm" 
                                 className="flex-1" 
+                                onClick={() => handleResizeByPercentage(75)}
                             >
                                 75%
                             </Button>

@@ -3,6 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { SettingsIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFiles } from "@/lib/context/FileContext";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const OtherOptions = () => {
     const [removeBackground, setRemoveBackground] = useState(false);
@@ -41,13 +42,26 @@ const OtherOptions = () => {
                 <SettingsIcon className="h-4 w-4 text-neutral-300" />
                 Other options
             </span>
+            {/* <div className="flex items-center gap-2">
+                <Switch checked={removeBackground} onCheckedChange={handleRemoveBackground} id="remove-background" disabled={removeBackgroundDisabled} />
+                <Label htmlFor="remove-background">Remove background</Label>
+            </div> */}
+       
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2">
+                        <Switch checked={removeBackground} onCheckedChange={handleRemoveBackground} id="remove-background" disabled />
+                        <Label htmlFor="remove-background">Remove background</Label>
+                    </div>
+                </TooltipTrigger>
+                <TooltipContent align="start">
+                    Do not available yet
+                </TooltipContent>
+            </Tooltip>
+
             <div className="flex items-center gap-2">
-                <Switch checked={removeBackground} onCheckedChange={handleRemoveBackground} disabled={removeBackgroundDisabled} />
-                <Label htmlFor="airplane-mode">Remove background</Label>
-            </div>
-            <div className="flex items-center gap-2">
-                <Switch onCheckedChange={handleCompress} />
-                <Label htmlFor="airplane-mode">Compress image</Label>
+                <Switch onCheckedChange={handleCompress} id="compress" />
+                <Label htmlFor="compress">Compress image</Label>
             </div>
         </div>
     )

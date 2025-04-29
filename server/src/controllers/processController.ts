@@ -81,7 +81,7 @@ const processFile = async (res: Response, file: FileType, originalPath: string, 
     if (newWidth && newHeight) {
         const width = parseInt(newWidth);
         const height = parseInt(newHeight);
-        if (Number.isInteger(width) && Number.isInteger(height) && width > 0 && height > 0) {
+        if (Number.isInteger(width) && Number.isInteger(height) && width > 0 && height > 0 && width !== file.originalWidth && height !== file.originalHeight) {
             sharpInstance = sharpInstance.resize(width, height);
         } else {
             res.status(400).json({
@@ -110,9 +110,9 @@ const processFile = async (res: Response, file: FileType, originalPath: string, 
     }
 
     // background removal
-    if (removeBackground && file.processedFormat !== 'jpeg') {
-        sharpInstance = sharpInstance.removeAlpha().ensureAlpha(0);
-    }
+    // if (removeBackground && file.processedFormat !== 'jpeg') {
+
+    // }
 
     return sharpInstance.toBuffer();
 }
